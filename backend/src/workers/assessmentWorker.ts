@@ -2,12 +2,14 @@ import { Worker, Job } from 'bullmq';
 import { getRedis } from '../config/redis';
 import { Assessment } from '../models/Assessment';
 import { generateQuestions } from '../services/aiService';
+import { emitToClient } from '../config/websocket';
 
 const connection = getRedis();
 
 /**
  * BullMQ Worker listening to the 'assessmentQueue'.
- * Processes background AI question generation jobs, updates Mongo status, and saves results.
+ * Processes background AI question generation jobs, updates Mongo status,
+ * saves results, and notifies clients via WebSockets in real-time.
  */
 export const assessmentWorker = new Worker(
   'assessmentQueue',
@@ -32,6 +34,12 @@ export const assessmentWorker = new Worker(
       assessment.status = 'processing';
       await assessment.save();
       console.log(`[Worker] Updated assessment status to 'processing' for ID: ${assessmentId}`);
+      
+      // Notify the frontend via WebSocket that processing has started
+      emitToClient(assessmentId, 'job:processing', {
+        status: 'processing',
+        message: 'AI question generation has started.',
+      });
 
       // 3. Call generateQuestions using the assessment document configuration
       console.log(`[Worker] Requesting Groq AI question generation for assessment: ${assessmentId}...`);
@@ -65,7 +73,10 @@ export const assessmentWorker = new Worker(
       await assessment.save();
       console.log(`[Worker] Successfully completed job and saved assessment results for ID: ${assessmentId}`);
 
-    } catch (error) {
+      // Notify the frontend via WebSocket that generation is complete
+      emitToClient(assessmentId, 'job:completed', assessment);
+
+    } catch (error: any) {
       console.error(`[Worker] Failed to process job ${job.id}:`, error);
 
       // 6. On error, update the assessment status to 'failed' in MongoDB
@@ -76,6 +87,12 @@ export const assessmentWorker = new Worker(
       } catch (dbErr) {
         console.error(`[Worker] Failed to update assessment status to 'failed' in DB:`, dbErr);
       }
+
+      // Notify the frontend via WebSocket that the job failed
+      emitToClient(assessmentId, 'job:failed', {
+        status: 'failed',
+        error: error.message || 'An unknown error occurred during AI generation.',
+      });
 
       throw error;
     }

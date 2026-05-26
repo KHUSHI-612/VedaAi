@@ -1,8 +1,10 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { createServer } from 'http';
 import { connectDB } from './config/database';
 import { redisClient } from './config/redis';
+import { initWebSocket } from './config/websocket';
 
 // Load environment variables
 dotenv.config();
@@ -24,6 +26,12 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
+// Create the Node HTTP server wrapping the Express application instance
+const server = createServer(app);
+
+// Initialize and bind the WebSocket server to the HTTP server
+initWebSocket(server);
+
 /**
  * Initializes all dependent connections (MongoDB, Redis) and starts the HTTP server.
  */
@@ -38,8 +46,8 @@ async function bootstrap() {
     const redisPong = await redisClient.ping();
     console.log(`Redis connected successfully. Ping response: ${redisPong}`);
 
-    // 3. Start the HTTP Server
-    app.listen(PORT, () => {
+    // 3. Start the HTTP and WebSocket Server
+    server.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
   } catch (error) {
