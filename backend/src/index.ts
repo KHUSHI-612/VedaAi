@@ -11,6 +11,9 @@ import { initWebSocket } from './config/websocket';
 import assessmentRoutes from './routes/assessments';
 import uploadRoutes from './routes/upload';
 
+// Import Error Handlers
+import { notFoundHandler, errorHandler } from './middleware/errorHandler';
+
 // Load environment variables
 dotenv.config();
 
@@ -37,6 +40,10 @@ app.get('/api/health', (req, res) => {
 // Register REST API Route Handlers
 app.use('/api/assessments', assessmentRoutes);
 app.use('/api/upload', uploadRoutes);
+
+// Register Error Handling Middleware (must be registered after routes)
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 // Create the Node HTTP server wrapping the Express application instance
 const server = createServer(app);
