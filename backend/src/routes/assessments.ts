@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { Assessment } from '../models/Assessment';
 import { assessmentQueue } from '../config/queue';
 import { emitToClient } from '../config/websocket';
+import { generatePDF } from '../services/pdfService';
 
 const router = Router();
 
@@ -95,10 +96,33 @@ router.get('/:id', async (req: Request, res: Response) => {
 
 /**
  * GET /api/assessments/:id/pdf
- * Placeholder for PDF download endpoint.
+ * Generates and downloads the assessment question paper as a beautifully formatted PDF.
  */
 router.get('/:id/pdf', async (req: Request, res: Response) => {
-  res.status(200).json({ message: 'coming soon' });
+  try {
+    const { id } = req.params;
+    const assessment = await Assessment.findById(id);
+
+    if (!assessment) {
+      return res.status(404).json({ error: 'Assessment not found.' });
+    }
+
+    if (assessment.status !== 'completed') {
+      return res.status(400).json({ error: 'Assessment question paper generation is not completed yet.' });
+    }
+
+    console.log(`[Router] Generating PDF for completed assessment ${id}...`);
+    const pdfBuffer = await generatePDF(assessment);
+
+    // Sanitize title to use in filename
+    const safeTitle = assessment.title.toLowerCase().replace(/[^a-z0-9]/g, '-');
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${safeTitle}-${id}.pdf"`);
+    res.send(pdfBuffer);
+  } catch (error: any) {
+    console.error('Error generating assessment PDF:', error);
+    res.status(500).json({ error: error.message || 'Failed to generate PDF.' });
+  }
 });
 
 export default router;
