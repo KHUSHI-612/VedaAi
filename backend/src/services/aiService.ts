@@ -1,11 +1,10 @@
 import Groq from 'groq-sdk';
-import { IAssessmentResult } from '../models/Assessment';
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
-export interface GenerateAssessmentInput {
+export interface AssessmentDataInput {
   title: string;
   subject: string;
   className: string;
@@ -17,10 +16,9 @@ export interface GenerateAssessmentInput {
 }
 
 /**
- * Generates a structured assessment using Groq API and llama-3.3-70b-versatile in JSON mode.
- *converts it into a strongly typed IAssessmentResult containing sections and questions.
+ * Builds the instruction prompt for Groq, defining target criteria and requested JSON structure.
  */
-export const generateAssessment = async (input: GenerateAssessmentInput): Promise<IAssessmentResult> => {
+export const buildPrompt = (assessmentData: AssessmentDataInput): string => {
   const {
     title,
     subject,
@@ -30,9 +28,9 @@ export const generateAssessment = async (input: GenerateAssessmentInput): Promis
     marksPerQuestion,
     difficulty,
     instructions,
-  } = input;
+  } = assessmentData;
 
-  const prompt = `
+  return `
 You are an expert curriculum developer and academic educator. Your task is to generate a comprehensive, highly rigorous, and structured question paper (assessment) for students based on the following criteria:
 
 - **Assessment Title**: ${title}
@@ -41,24 +39,24 @@ You are an expert curriculum developer and academic educator. Your task is to ge
 - **Types of Questions to Include**: ${questionTypes.join(', ')}
 - **Total Number of Questions**: ${numQuestions}
 ${marksPerQuestion ? `- **Standard Marks per Question**: ${marksPerQuestion}` : ''}
-- **Overall Difficulty Level**: ${difficulty} (Ensure the ratio of questions matches this target: 'easy' questions should be simple, 'medium' should require conceptual clarity, and 'hard' should require critical thinking/analytical application.)
+- **Overall Difficulty Level**: ${difficulty}
 ${instructions ? `- **Additional Instructions**: ${instructions}` : ''}
 
 ### Response Requirements:
-You must output a single JSON object. The JSON object must strictly conform to the following schema:
+You must output a single JSON object. The JSON object must strictly conform to this structure:
 
 {
   "sections": [
     {
-      "name": "Section A",
-      "instructions": "Instructions for Section A...",
+      "title": "Section A",
+      "type": "mcq", // e.g. mcq, short, long
+      "instructions": "Choose correct option",
       "questions": [
         {
           "text": "Question text...",
-          "options": ["Option A", "Option B", "Option C", "Option D"], // Only include for multiple choice question types
-          "correctAnswer": "Option A", // Include correct answer for questions where applicable
-          "marks": 5, // Marks for this question
-          "difficulty": "easy" // 'easy', 'medium', or 'hard'
+          "difficulty": "easy", // 'easy', 'medium', or 'hard'
+          "marks": 1,
+          "options": ["A) opt1", "B) opt2", "C) opt3", "D) opt4"] // Only include options array for mcq types
         }
       ]
     }
@@ -67,10 +65,17 @@ You must output a single JSON object. The JSON object must strictly conform to t
 
 Ensure that:
 1. The total number of questions across all sections matches exactly ${numQuestions}.
-2. Sections are logically separated (e.g. Section A: Multiple Choice Questions, Section B: Short Answer Questions, Section C: Long Answer / Subjective Questions) depending on the requested questionTypes.
-3. Every question has a clear, realistic difficulty level ('easy', 'medium', or 'hard') and a logical mark weight.
-4. The questions are highly academic, realistic, and completely free of placeholders.
+2. Sections are logically separated depending on the requested questionTypes.
+3. Every question is highly academic, clear, and completely free of placeholders.
 `;
+};
+
+/**
+ * Calls Groq API with llama-3.3-70b-versatile, forcing a structured JSON output,
+ * and returns the parsed JSON matching the requested section-question schema.
+ */
+export const generateQuestions = async (assessmentData: AssessmentDataInput): Promise<any> => {
+  const prompt = buildPrompt(assessmentData);
 
   try {
     const chatCompletion = await groq.chat.completions.create({
@@ -94,16 +99,16 @@ Ensure that:
       throw new Error('Groq returned an empty response.');
     }
 
-    const parsedResult: IAssessmentResult = JSON.parse(content);
+    const parsedResult = JSON.parse(content);
     
-    // Basic structural verification
+    // Basic verification on sections structure
     if (!parsedResult.sections || !Array.isArray(parsedResult.sections)) {
       throw new Error('Invalid response structure: missing sections array.');
     }
 
     return parsedResult;
   } catch (error) {
-    console.error('Error generating assessment via Groq:', error);
+    console.error('Error generating assessment questions via Groq:', error);
     throw error;
   }
 };
