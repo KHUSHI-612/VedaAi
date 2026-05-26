@@ -1,10 +1,15 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 import { createServer } from 'http';
 import { connectDB } from './config/database';
 import { redisClient } from './config/redis';
 import { initWebSocket } from './config/websocket';
+
+// Import Route Handlers
+import assessmentRoutes from './routes/assessments';
+import uploadRoutes from './routes/upload';
 
 // Load environment variables
 dotenv.config();
@@ -21,10 +26,17 @@ app.use(cors({
 // Parse JSON request bodies
 app.use(express.json());
 
+// Serve uploads folder as a static files folder publicly
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
 // Healthcheck endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
+
+// Register REST API Route Handlers
+app.use('/api/assessments', assessmentRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Create the Node HTTP server wrapping the Express application instance
 const server = createServer(app);
