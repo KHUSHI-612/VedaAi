@@ -78,7 +78,13 @@ export default function Sidebar() {
 
       {/* Create Assignment Button */}
       <button
-        onClick={() => router.push('/dashboard/create')}
+        onClick={() => {
+          if (!userProfile) {
+            router.push('/dashboard?triggerProfile=true');
+          } else {
+            router.push('/dashboard/create');
+          }
+        }}
         className="group relative mt-6 w-full bg-[#1a1a1a] hover:bg-black text-white py-3 px-5 rounded-full flex items-center justify-center gap-2 text-sm font-semibold transition-all duration-200 active:scale-[0.98] border-2 border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.18)] hover:shadow-[0_0_18px_rgba(249,115,22,0.35)]"
       >
         <Sparkles className="w-4 h-4 text-orange-400 group-hover:animate-pulse" />

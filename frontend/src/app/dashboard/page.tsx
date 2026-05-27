@@ -16,6 +16,7 @@ import {
   Loader2,
   FileText,
   AlertTriangle,
+  X,
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -59,13 +60,30 @@ export default function DashboardPage() {
 
   // 2. Trigger welcome modal if userProfile is empty after load
   useEffect(() => {
-    // We check userProfile explicitly. If empty (and loading finished), show modal.
-    if (!isLoading && !userProfile) {
-      setShowWelcomeModal(true);
-    } else {
-      setShowWelcomeModal(false);
+    if (!isLoading) {
+      if (!userProfile) {
+        setShowWelcomeModal(true);
+        // Check for redirect query parameter trigger
+        if (typeof window !== 'undefined') {
+          const urlParams = new URLSearchParams(window.location.search);
+          if (urlParams.get('triggerProfile') === 'true') {
+            setModalError('Please set up your profile to start creating assignments!');
+          }
+        }
+      } else {
+        setShowWelcomeModal(false);
+      }
     }
   }, [isLoading, userProfile]);
+
+  const handleCreateAssignmentClick = () => {
+    if (!userProfile) {
+      setShowWelcomeModal(true);
+      setModalError('Please set up your profile to start creating assignments!');
+    } else {
+      router.push('/dashboard/create');
+    }
+  };
 
   // 3. Handle welcome modal form submission
   const handleModalSubmit = (e: React.FormEvent) => {
@@ -159,7 +177,7 @@ export default function DashboardPage() {
           </p>
 
           <button
-            onClick={() => router.push('/dashboard/create')}
+            onClick={handleCreateAssignmentClick}
             className="bg-[#1a1a1a] hover:bg-black text-white px-7 py-3.5 rounded-full text-sm font-semibold shadow-[0_4px_16px_rgba(0,0,0,0.1)] transition-all active:scale-[0.98]"
           >
             + Create Your First Assignment
@@ -314,7 +332,7 @@ export default function DashboardPage() {
           {/* Desktop Fixed Bottom Create Button */}
           <div className="hidden md:flex justify-center fixed bottom-6 left-1/2 -translate-x-1/2 z-20">
             <button
-              onClick={() => router.push('/dashboard/create')}
+              onClick={handleCreateAssignmentClick}
               className="bg-[#1a1a1a] hover:bg-black text-white px-6 py-3 rounded-full text-sm font-semibold flex items-center gap-2 shadow-lg hover:shadow-xl active:scale-[0.98] transition-all duration-150 border border-gray-800"
             >
               <Plus className="w-4 h-4" />
@@ -328,7 +346,7 @@ export default function DashboardPage() {
       {/* Mobile Floating Action Button (FAB) (bottom right) */}
       <div className="flex md:hidden fixed bottom-20 right-6 z-40">
         <button
-          onClick={() => router.push('/dashboard/create')}
+          onClick={handleCreateAssignmentClick}
           className="w-12 h-12 bg-[#1a1a1a] text-white rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-transform"
         >
           <Plus className="w-6 h-6" />
@@ -342,6 +360,15 @@ export default function DashboardPage() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-[32px] p-8 max-w-md w-full shadow-2xl relative flex flex-col items-center border border-gray-100 animate-scaleIn">
             
+            {/* Close Button X */}
+            <button
+              type="button"
+              onClick={() => setShowWelcomeModal(false)}
+              className="absolute right-6 top-6 text-gray-400 hover:text-gray-700 transition-colors p-1.5 rounded-full hover:bg-gray-50 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
             {/* VedaAI Logo Header */}
             <div className="relative w-[130px] h-9 mb-4">
               <Image
