@@ -1,11 +1,15 @@
+import dotenv from 'dotenv';
+// Load environment variables immediately before any other module imports
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import path from 'path';
 import { createServer } from 'http';
 import { connectDB } from './config/database';
 import { redisClient } from './config/redis';
 import { initWebSocket } from './config/websocket';
+import './workers/assessmentWorker';
 
 // Import Route Handlers
 import assessmentRoutes from './routes/assessments';
@@ -13,9 +17,6 @@ import uploadRoutes from './routes/upload';
 
 // Import Error Handlers
 import { notFoundHandler, errorHandler } from './middleware/errorHandler';
-
-// Load environment variables
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
