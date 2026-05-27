@@ -1,25 +1,31 @@
 export interface Question {
-  id: string;
-  text: string;
-  options?: string[];
-  correctAnswer?: string;
-  marks: number;
-  difficulty: 'easy' | 'medium' | 'hard';
+  id: string
+  text: string
+  type: 'mcq' | 'short' | 'long' | 'diagram' | 'numerical'
+  difficulty: 'easy' | 'medium' | 'hard'
+  marks: number
+  options?: string[]
 }
 
 export interface Section {
-  name: string; // Section A, B, C
-  instructions: string;
-  questions: Question[];
+  title: string
+  instructions: string
+  questions: Question[]
 }
 
 export interface Assessment {
-  id: string;
-  subject: string;
-  classLevel: string;
-  marks: number;
-  difficulty: 'easy' | 'medium' | 'hard';
-  sections: Section[];
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  createdAt: string;
+  _id: string
+  title: string
+  subject: string
+  className: string
+  dueDate: string
+  status: 'pending' | 'processing' | 'completed' | 'failed'
+  result?: { sections: Section[] }
+  createdAt: string
+}
+
+export interface UserProfile {
+  name: string
+  schoolName: string
+  city: string
 }
