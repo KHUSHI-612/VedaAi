@@ -236,24 +236,24 @@ export default function CreateAssignmentPage() {
       <div className="flex-1 min-w-0">
 
         {/* 1. Header Section */}
-        <div className="mb-6 flex flex-col gap-1">
-          <div className="flex items-center gap-2.5">
-            <span className="w-3 h-3 bg-[#4ade80] rounded-full ring-4 ring-[#4ade80]/20" />
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight font-sans">
-              Create Assignment
-            </h1>
-          </div>
-          <p className="text-sm text-gray-400">
-            Set up a new assignment for your students
-          </p>
+        <div className="mb-6 flex items-center justify-between relative px-2 md:px-0">
+          <button
+            type="button"
+            onClick={() => router.push('/dashboard')}
+            className="w-11 h-11 bg-black/5 hover:bg-black/10 rounded-full flex items-center justify-center transition-colors z-10"
+          >
+            <ArrowLeft className="w-5 h-5 text-gray-800 stroke-[2]" />
+          </button>
+          <h1 className="text-[17px] font-bold text-gray-800 absolute left-1/2 -translate-x-1/2">
+            Create Assignment
+          </h1>
+          <div className="w-11"></div> {/* Spacer for perfect centering */}
         </div>
 
         {/* 2. Step Progress Bar */}
-        <div className="w-full bg-gray-200 h-1.5 rounded-full mb-8 relative overflow-hidden shadow-inner">
-          <div
-            className="bg-[#1a1a1a] h-full rounded-full transition-all duration-300 ease-out"
-            style={{ width: step === 1 ? '50%' : '100%' }}
-          />
+        <div className="flex gap-1.5 mb-6 px-2 md:px-0">
+          <div className="h-1.5 flex-1 bg-gray-600 rounded-full"></div>
+          <div className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${step === 2 ? 'bg-gray-600' : 'bg-gray-300/60'}`}></div>
         </div>
 
         {/* 3. Main Form Container */}
@@ -272,7 +272,7 @@ export default function CreateAssignmentPage() {
           {/* ======================================================== */}
           {step === 1 && (
             <div className="animate-fadeIn pb-32 md:pb-0">
-              <div className="space-y-6 md:bg-white md:border md:border-gray-100 md:rounded-[32px] md:p-8 md:shadow-[0_8px_32px_rgba(0,0,0,0.02)]">
+              <div className="space-y-6">
 
               {/* Step Heading */}
               <div>
@@ -355,21 +355,113 @@ export default function CreateAssignmentPage() {
               </div>
 
               {/* Question Types Layout Grid */}
-              <div className="space-y-4 pt-2">
+              <div className="space-y-3 pt-4">
+                {/* Desktop Headers */}
+                <div className="hidden sm:flex items-center gap-4 w-full px-1 mb-2">
+                  <div className="flex-1">
+                    <span className="text-[13px] font-bold text-gray-800">Question Type</span>
+                  </div>
+                  {/* Spacer for X button */}
+                  <div className="w-5"></div>
+                  <div className="w-[120px] text-center">
+                    <span className="text-[13px] font-bold text-gray-800">No. of Questions</span>
+                  </div>
+                  <div className="w-[120px] text-center">
+                    <span className="text-[13px] font-bold text-gray-800">Marks</span>
+                  </div>
+                </div>
+
                 {/* Rows */}
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {questionRows.map((row) => (
-                    <div
-                      key={row.id}
-                      className="flex flex-col bg-white rounded-3xl p-4 shadow-[0_2px_10px_rgba(0,0,0,0.04)]"
-                    >
-                      {/* Top row: Dropdown and Delete */}
-                      <div className="flex items-center justify-between mb-4 px-2">
-                        <div className="relative flex-1">
+                    <div key={row.id}>
+                      {/* MOBILE LAYOUT (Card Style) */}
+                      <div className="flex sm:hidden flex-col bg-white rounded-3xl p-4 shadow-sm mb-4">
+                        {/* Top row: Dropdown and Delete */}
+                        <div className="flex items-center justify-between mb-4 px-1">
+                          <div className="relative flex-1">
+                            <select
+                              value={row.type}
+                              onChange={(e) => updateRowField(row.id, 'type', e.target.value)}
+                              className="w-full appearance-none bg-transparent text-[14px] font-medium text-gray-800 pr-8 focus:outline-none cursor-pointer"
+                            >
+                              <option value="mcq">Multiple Choice Questions</option>
+                              <option value="short">Short Questions</option>
+                              <option value="long">Long Questions</option>
+                              <option value="diagram">Diagram/Graph-Based Questions</option>
+                              <option value="numerical">Numerical Problems</option>
+                            </select>
+                            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gray-800 pointer-events-none stroke-[2.5]" />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeQuestionRow(row.id)}
+                            className="text-gray-800 hover:text-red-500 transition-colors p-1"
+                          >
+                            <X className="w-4.5 h-4.5 stroke-[2]" />
+                          </button>
+                        </div>
+
+                        {/* Bottom Box: No. of Questions and Marks */}
+                        <div className="bg-[#f0f0f0] rounded-[24px] p-3 flex gap-3">
+                          {/* No. of Questions */}
+                          <div className="flex-1 flex flex-col items-center">
+                            <span className="text-[12px] text-gray-800 font-medium mb-2">No. of Questions</span>
+                            <div className="w-full bg-white border-0 rounded-full px-3 py-1.5 flex items-center justify-between shadow-sm select-none">
+                              <button
+                                type="button"
+                                onClick={() => updateRowField(row.id, 'numQuestions', Math.max(1, row.numQuestions - 1))}
+                                className="text-gray-400 hover:text-gray-800 text-[18px] leading-none font-light px-1"
+                              >
+                                −
+                              </button>
+                              <span className="text-[13px] font-bold text-gray-800">
+                                {row.numQuestions}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => updateRowField(row.id, 'numQuestions', row.numQuestions + 1)}
+                                className="text-gray-400 hover:text-gray-800 text-[18px] leading-none font-light px-1"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Marks */}
+                          <div className="flex-1 flex flex-col items-center">
+                            <span className="text-[12px] text-gray-800 font-medium mb-2">Marks</span>
+                            <div className="w-full bg-white border-0 rounded-full px-3 py-1.5 flex items-center justify-between shadow-sm select-none">
+                              <button
+                                type="button"
+                                onClick={() => updateRowField(row.id, 'marks', Math.max(1, row.marks - 1))}
+                                className="text-gray-400 hover:text-gray-800 text-[18px] leading-none font-light px-1"
+                              >
+                                −
+                              </button>
+                              <span className="text-[13px] font-bold text-gray-800">
+                                {row.marks}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => updateRowField(row.id, 'marks', row.marks + 1)}
+                                className="text-gray-400 hover:text-gray-800 text-[18px] leading-none font-light px-1"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* DESKTOP LAYOUT (Horizontal Inline) */}
+                      <div className="hidden sm:flex flex-row items-center gap-4 w-full">
+                        {/* Dropdown */}
+                        <div className="relative flex-1 w-full bg-white rounded-full shadow-sm">
                           <select
                             value={row.type}
                             onChange={(e) => updateRowField(row.id, 'type', e.target.value)}
-                            className="w-full appearance-none bg-transparent text-[15px] font-medium text-gray-800 pr-8 focus:outline-none cursor-pointer"
+                            className="w-full appearance-none bg-transparent px-5 py-3.5 text-[14px] font-medium text-gray-800 pr-10 focus:outline-none cursor-pointer rounded-full"
                           >
                             <option value="mcq">Multiple Choice Questions</option>
                             <option value="short">Short Questions</option>
@@ -377,65 +469,58 @@ export default function CreateAssignmentPage() {
                             <option value="diagram">Diagram/Graph-Based Questions</option>
                             <option value="numerical">Numerical Problems</option>
                           </select>
-                          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gray-800 pointer-events-none stroke-[2.5]" />
+                          <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gray-800 pointer-events-none stroke-[2.5]" />
                         </div>
+
+                        {/* Delete */}
                         <button
                           type="button"
                           onClick={() => removeQuestionRow(row.id)}
-                          className="text-gray-800 hover:text-red-500 transition-colors p-1"
+                          className="text-gray-800 hover:text-red-500 transition-colors shrink-0"
                         >
-                          <X className="w-4.5 h-4.5 stroke-[2]" />
+                          <X className="w-5 h-5 stroke-[2]" />
                         </button>
-                      </div>
 
-                      {/* Bottom Box: No. of Questions and Marks */}
-                      <div className="bg-[#f0f0f0] rounded-[24px] p-4 flex gap-4">
-                        {/* No. of Questions */}
-                        <div className="flex-1 flex flex-col items-center">
-                          <span className="text-[13px] text-gray-800 font-medium mb-3">No. of Questions</span>
-                          <div className="w-full bg-white border-0 rounded-full px-3 py-2 flex items-center justify-between shadow-sm select-none">
-                            <button
-                              type="button"
-                              onClick={() => updateRowField(row.id, 'numQuestions', Math.max(1, row.numQuestions - 1))}
-                              className="text-gray-400 hover:text-gray-800 text-[20px] leading-none font-light px-2"
-                            >
-                              −
-                            </button>
-                            <span className="text-[14px] font-bold text-gray-800">
-                              {row.numQuestions}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => updateRowField(row.id, 'numQuestions', row.numQuestions + 1)}
-                              className="text-gray-400 hover:text-gray-800 text-[20px] leading-none font-light px-2"
-                            >
-                              +
-                            </button>
-                          </div>
+                        {/* No. of Questions Pill */}
+                        <div className="w-[120px] bg-white rounded-full px-3 py-2.5 flex items-center justify-between shadow-sm shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => updateRowField(row.id, 'numQuestions', Math.max(1, row.numQuestions - 1))}
+                            className="text-gray-400 hover:text-gray-800 text-[20px] leading-none font-light px-2"
+                          >
+                            −
+                          </button>
+                          <span className="text-[14px] font-bold text-gray-800">
+                            {row.numQuestions}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => updateRowField(row.id, 'numQuestions', row.numQuestions + 1)}
+                            className="text-gray-400 hover:text-gray-800 text-[20px] leading-none font-light px-2"
+                          >
+                            +
+                          </button>
                         </div>
 
-                        {/* Marks */}
-                        <div className="flex-1 flex flex-col items-center">
-                          <span className="text-[13px] text-gray-800 font-medium mb-3">Marks</span>
-                          <div className="w-full bg-white border-0 rounded-full px-3 py-2 flex items-center justify-between shadow-sm select-none">
-                            <button
-                              type="button"
-                              onClick={() => updateRowField(row.id, 'marks', Math.max(1, row.marks - 1))}
-                              className="text-gray-400 hover:text-gray-800 text-[20px] leading-none font-light px-2"
-                            >
-                              −
-                            </button>
-                            <span className="text-[14px] font-bold text-gray-800">
-                              {row.marks}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => updateRowField(row.id, 'marks', row.marks + 1)}
-                              className="text-gray-400 hover:text-gray-800 text-[20px] leading-none font-light px-2"
-                            >
-                              +
-                            </button>
-                          </div>
+                        {/* Marks Pill */}
+                        <div className="w-[120px] bg-white rounded-full px-3 py-2.5 flex items-center justify-between shadow-sm shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => updateRowField(row.id, 'marks', Math.max(1, row.marks - 1))}
+                            className="text-gray-400 hover:text-gray-800 text-[20px] leading-none font-light px-2"
+                          >
+                            −
+                          </button>
+                          <span className="text-[14px] font-bold text-gray-800">
+                            {row.marks}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => updateRowField(row.id, 'marks', row.marks + 1)}
+                            className="text-gray-400 hover:text-gray-800 text-[20px] leading-none font-light px-2"
+                          >
+                            +
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -446,9 +531,9 @@ export default function CreateAssignmentPage() {
                 <button
                   type="button"
                   onClick={addQuestionRow}
-                  className="flex items-center gap-2 text-xs font-bold text-gray-700 hover:text-orange-500 py-2 px-3 rounded-xl hover:bg-gray-50 transition-colors mt-2"
+                  className="flex items-center gap-2.5 text-[13px] font-bold text-gray-800 hover:text-black py-2 rounded-xl transition-colors mt-2"
                 >
-                  <span className="w-5 h-5 bg-[#1a1a1a] hover:bg-black rounded-full flex items-center justify-center text-white text-sm">
+                  <span className="w-6 h-6 bg-[#1a1a1a] hover:bg-black rounded-full flex items-center justify-center text-white text-sm pb-[1px]">
                     +
                   </span>
                   <span>Add Question Type</span>
@@ -456,12 +541,12 @@ export default function CreateAssignmentPage() {
               </div>
 
               {/* Total Summary Stats */}
-              <div className="flex flex-col items-end text-right gap-1 pt-2">
-                <span className="text-xs font-bold text-gray-700">
-                  Total Questions: <span className="text-sm font-bold text-orange-600 pl-1">{totalQuestions}</span>
+              <div className="flex flex-col items-end text-right gap-1.5 pt-2 pr-2">
+                <span className="text-[13px] font-bold text-gray-800">
+                  Total Questions : <span>{totalQuestions}</span>
                 </span>
-                <span className="text-xs font-bold text-gray-700">
-                  Total Marks: <span className="text-sm font-bold text-orange-600 pl-1">{totalMarks}</span>
+                <span className="text-[13px] font-bold text-gray-800">
+                  Total Marks : <span>{totalMarks}</span>
                 </span>
               </div>
 
@@ -490,26 +575,24 @@ export default function CreateAssignmentPage() {
 
               </div>
               
-              {/* Step 1 Navigation footer buttons - Floating on mobile, Static outside on desktop */}
-              <div className="fixed bottom-[80px] left-0 right-0 px-6 flex justify-center z-40 md:static md:bottom-auto md:px-0 md:justify-end md:mt-6">
-                <div className="flex items-center bg-white md:bg-transparent rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] md:shadow-none p-1.5 md:p-0 gap-0 md:gap-4 border md:border-0 border-gray-200">
-                  <button
-                    type="button"
-                    onClick={() => router.push('/dashboard')}
-                    className="bg-white text-gray-800 hover:bg-gray-50 py-3.5 px-6 rounded-l-full md:rounded-full md:border md:border-gray-200 text-sm font-semibold flex items-center gap-2 active:scale-95 transition-transform"
-                  >
-                    <ArrowLeft className="w-4.5 h-4.5" />
-                    <span className="pr-2 md:pr-0">Previous</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleNextStep}
-                    className="bg-[#1a1a1a] text-white hover:bg-black py-3.5 px-8 rounded-full text-sm font-semibold flex items-center gap-2 active:scale-95 transition-transform shadow-md"
-                  >
-                    <span>Next</span>
-                    <ArrowRight className="w-4.5 h-4.5" />
-                  </button>
-                </div>
+              {/* Step 1 Navigation footer buttons */}
+              <div className="fixed bottom-[100px] left-0 right-0 px-6 flex justify-center gap-3 z-40 md:static md:bottom-auto md:px-0 md:mt-8 md:w-full md:justify-between">
+                <button
+                  type="button"
+                  onClick={() => router.push('/dashboard')}
+                  className="bg-white text-gray-800 hover:bg-gray-50 py-3.5 px-6 rounded-full border border-gray-200 text-sm font-semibold flex items-center gap-2 active:scale-95 transition-transform shadow-sm md:shadow-none"
+                >
+                  <ArrowLeft className="w-4.5 h-4.5" />
+                  <span>Previous</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNextStep}
+                  className="bg-[#1a1a1a] text-white hover:bg-black py-3.5 px-8 rounded-full text-sm font-semibold flex items-center gap-2 active:scale-95 transition-transform shadow-md"
+                >
+                  <span>Next</span>
+                  <ArrowRight className="w-4.5 h-4.5" />
+                </button>
               </div>
 
             </div>
@@ -674,37 +757,35 @@ export default function CreateAssignmentPage() {
 
               </div>
 
-              {/* Step 2 Navigation footer buttons - Floating on mobile, Static outside on desktop */}
-              <div className="fixed bottom-[80px] left-0 right-0 px-6 flex justify-center z-40 md:static md:bottom-auto md:px-0 md:justify-end md:mt-6">
-                <div className="flex items-center bg-white md:bg-transparent rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] md:shadow-none p-1.5 md:p-0 gap-0 md:gap-4 border md:border-0 border-gray-200">
-                  <button
-                    type="button"
-                    onClick={() => setStep(1)}
-                    disabled={isSubmitting}
-                    className="bg-white text-gray-800 hover:bg-gray-50 py-3.5 px-6 rounded-l-full md:rounded-full md:border md:border-gray-200 text-sm font-semibold flex items-center gap-2 active:scale-95 transition-transform disabled:opacity-50 disabled:pointer-events-none"
-                  >
-                    <ArrowLeft className="w-4.5 h-4.5" />
-                    <span className="pr-2 md:pr-0">Previous</span>
-                  </button>
+              {/* Step 2 Navigation footer buttons */}
+              <div className="fixed bottom-[100px] left-0 right-0 px-6 flex justify-center gap-3 z-40 md:static md:bottom-auto md:px-0 md:mt-8 md:w-full md:justify-between">
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  disabled={isSubmitting}
+                  className="bg-white text-gray-800 hover:bg-gray-50 py-3.5 px-6 rounded-full border border-gray-200 text-sm font-semibold flex items-center gap-2 active:scale-95 transition-transform shadow-sm md:shadow-none disabled:opacity-50 disabled:pointer-events-none"
+                >
+                  <ArrowLeft className="w-4.5 h-4.5" />
+                  <span>Previous</span>
+                </button>
 
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="bg-[#1a1a1a] text-white hover:bg-black py-3.5 px-8 rounded-full text-sm font-semibold flex items-center gap-2.5 active:scale-95 transition-transform shadow-md disabled:opacity-50 disabled:pointer-events-none"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="w-4.5 h-4.5 animate-spin" />
-                        <span>Generating Paper...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Generate</span>
-                        <ArrowRight className="w-4.5 h-4.5" />
-                      </>
-                    )}
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="bg-[#1a1a1a] text-white hover:bg-black py-3.5 px-8 rounded-full text-sm font-semibold flex items-center gap-2.5 active:scale-95 transition-transform shadow-md disabled:opacity-50 disabled:pointer-events-none"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4.5 h-4.5 animate-spin" />
+                      <span>Generating...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Generate</span>
+                      <ArrowRight className="w-4.5 h-4.5" />
+                    </>
+                  )}
+                </button>
               </div>
 
             </form>

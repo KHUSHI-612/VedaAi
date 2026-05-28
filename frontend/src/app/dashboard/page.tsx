@@ -175,9 +175,9 @@ export default function DashboardPage() {
       {/* STATE 1: EMPTY STATE                                     */}
       {/* ======================================================== */}
       {assessments.length === 0 ? (
-        <div className="flex flex-col items-center justify-center text-center flex-1 w-full h-full px-4 m-auto pb-12 transform -translate-x-4 translate-y-6">
+        <div className="flex flex-col items-center justify-center text-center flex-1 w-full h-full px-4 m-auto pb-12 transform translate-y-12 md:-translate-x-4 md:translate-y-6">
           {/* Centered Illustration */}
-          <div className="relative w-[340px] h-[260px] mb-8">
+          <div className="relative w-[280px] h-[210px] mb-8">
             <Image
               src="/Illustration found.png"
               alt="No assignments yet"
@@ -187,11 +187,11 @@ export default function DashboardPage() {
             />
           </div>
 
-          <h2 className="text-[22px] font-bold text-[#1a1a1a] tracking-tight leading-tight">
+          <h2 className="text-[18px] md:text-[20px] font-bold text-[#1a1a1a] tracking-tight leading-tight">
             No assignments yet
           </h2>
 
-          <p className="text-[14px] text-[#666666] max-w-[480px] mt-3 mb-8 leading-relaxed">
+          <p className="text-[13px] text-[#666666] max-w-[480px] mt-3 mb-8 leading-relaxed">
             Create your first assignment to start collecting and grading student submissions. You can set up rubrics, define marking criteria, and let AI assist with grading.
           </p>
 
@@ -244,16 +244,16 @@ export default function DashboardPage() {
             {filteredAssessments.map((assessment) => (
               <div
                 key={assessment._id}
-                className="relative bg-[#f8f9fa] rounded-[24px] p-5 transition-all duration-200 cursor-pointer shadow-sm border border-gray-100/50"
+                className="relative bg-white rounded-[24px] md:rounded-[32px] p-4 md:p-7 min-h-[110px] md:min-h-[180px] flex flex-col justify-between transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md border border-gray-100"
                 onClick={() => router.push(`/dashboard/assignments/${assessment._id}`)}
               >
                 {/* 3-Dot Options Button */}
-                <div className="absolute right-4 top-4">
+                <div className="absolute right-3 top-3 md:right-5 md:top-5 z-10">
                   <button
                     onClick={(e) => { e.stopPropagation(); setActiveMenuId(activeMenuId === assessment._id ? null : assessment._id); }}
                     className="p-1 rounded-full text-gray-400 hover:text-gray-700 transition-colors"
                   >
-                    <MoreVertical className="w-5 h-5" />
+                    <MoreVertical className="w-6 h-6" />
                   </button>
 
                   {/* Actions Dropdown */}
@@ -262,14 +262,14 @@ export default function DashboardPage() {
                       {/* Backdrop overlay — stop propagation so it doesn't navigate */}
                       <div className="fixed inset-0 z-10" onClick={(e) => { e.stopPropagation(); setActiveMenuId(null); }} />
 
-                      <div className="absolute right-0 mt-1 w-44 bg-white border border-gray-100 rounded-2xl shadow-xl p-1.5 z-20 flex flex-col gap-0.5 animate-fadeIn">
+                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-2 z-20 flex flex-col gap-1 animate-fadeIn border border-gray-50">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             setActiveMenuId(null);
                             router.push(`/dashboard/assignments/${assessment._id}`);
                           }}
-                          className="flex items-center gap-2.5 w-full text-left px-3 py-2 rounded-xl text-[13px] font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                          className="flex items-center gap-2.5 w-full text-left px-3 py-2.5 rounded-xl text-[14px] font-bold text-gray-700 hover:bg-gray-50 transition-colors"
                         >
                           <Eye className="w-4.5 h-4.5 text-gray-400" />
                           <span>View Assignment</span>
@@ -277,7 +277,7 @@ export default function DashboardPage() {
 
                         <button
                           onClick={(e) => { e.stopPropagation(); handleDeleteAssessment(assessment._id); }}
-                          className="flex items-center gap-2.5 w-full text-left px-3 py-2 rounded-xl text-[13px] font-semibold text-red-600 hover:bg-red-50 transition-colors"
+                          className="flex items-center gap-2.5 w-full text-left px-3 py-2.5 rounded-xl text-[14px] font-bold text-red-600 hover:bg-red-50 transition-colors"
                         >
                           <Trash2 className="w-4.5 h-4.5 text-red-500" />
                           <span>Delete</span>
@@ -288,19 +288,21 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Card Main details */}
-                <div className="space-y-4 pr-6">
+                <div className="flex-1 flex flex-col justify-between">
                   {/* Title */}
-                  <h3 className="text-[15px] font-bold text-neutral-800 line-clamp-1">
+                  <h3 className="text-[16px] md:text-[24px] font-bold text-gray-900 tracking-tight leading-tight line-clamp-2 pr-8 md:pr-10 mt-1 md:mt-1">
                     {assessment.title || 'Untitled Assessment'}
                   </h3>
 
                   {/* Date Row */}
-                  <div className="flex items-center gap-3 text-[12px] text-gray-500 font-medium">
+                  <div className="flex items-center justify-between text-[10.5px] sm:text-[11px] md:text-[14px] text-gray-500 font-medium mt-6 md:mt-10">
                     <span>
-                      <span className="text-gray-900 font-bold">Assigned on :</span> {formatDateSafe(assessment.createdAt)}
+                      <span className="text-gray-900 font-bold">Assigned on : </span>
+                      {formatDateSafe(assessment.createdAt)}
                     </span>
                     <span>
-                      <span className="text-gray-900 font-bold">Due :</span> 21-06-2025
+                      <span className="text-gray-900 font-bold">Due : </span>
+                      {formatDateSafe(assessment.dueDate)}
                     </span>
                   </div>
                 </div>
