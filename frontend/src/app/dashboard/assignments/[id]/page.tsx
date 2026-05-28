@@ -256,8 +256,11 @@ export default function AssignmentDetailsPage({ params }: AssignmentDetailsPageP
   return (
     <div className="w-full font-sans pb-16">
 
+      {/* Outer white wrapper for mobile — creates the extra layer effect */}
+      <div className="bg-white/80 md:bg-transparent rounded-[28px] md:rounded-none p-3 md:p-0 shadow-sm md:shadow-none">
+
       {/* 1. PART 1 — Dark banner */}
-      <div className="bg-[#303030] text-white px-6 pt-6 pb-6 rounded-[32px] mb-4 shadow-sm">
+      <div className="bg-[#303030] text-white px-6 pt-6 pb-6 rounded-[24px] md:rounded-[32px] mb-4 shadow-sm">
         <p className="text-[14px] font-medium leading-relaxed">
           Certainly, {userName}! Here are customized Question Paper for your {subject} {className} classes on the NCERT chapters:
         </p>
@@ -272,7 +275,7 @@ export default function AssignmentDetailsPage({ params }: AssignmentDetailsPageP
 
       {/* 3. PART 2 — White exam paper card */}
       <div
-        className="bg-white rounded-[32px] shadow-sm text-[#0f172a] select-text border border-gray-100"
+        className="bg-white rounded-[24px] md:rounded-[32px] shadow-md md:shadow-sm text-[#0f172a] select-text border border-gray-200 md:border-gray-100"
         style={{ padding: '40px 24px' }}
       >
 
@@ -417,6 +420,8 @@ export default function AssignmentDetailsPage({ params }: AssignmentDetailsPageP
         )}
 
       </div>
+
+      </div> {/* End outer white wrapper */}
 
     </div>
   );

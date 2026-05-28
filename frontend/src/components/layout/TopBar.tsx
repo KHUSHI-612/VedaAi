@@ -29,7 +29,7 @@ export default function TopBar({ title }: TopBarProps) {
   // Dynamically resolve page title if not provided as a prop
   const getPageTitle = () => {
     if (title) return title;
-    
+
     if (pathname === '/dashboard') return 'Assignment';
     if (pathname === '/dashboard/create') return 'Create Assignment';
     if (pathname === '/dashboard/settings') return 'Settings';
@@ -37,7 +37,7 @@ export default function TopBar({ title }: TopBarProps) {
     if (pathname === '/dashboard/toolkit') return "AI Teacher's Toolkit";
     if (pathname === '/dashboard/library') return 'My Library';
     if (pathname.startsWith('/dashboard/assignments/')) return 'Assignment Detail';
-    
+
     return 'Dashboard';
   };
 
@@ -47,7 +47,7 @@ export default function TopBar({ title }: TopBarProps) {
     <>
       {/* 1. DESKTOP FLOATING TOPBAR (hidden on mobile) */}
       <header className="hidden md:flex items-center justify-between bg-white border border-gray-100 rounded-2xl h-14 mt-4 mr-4 px-5 shadow-[0_4px_20px_rgba(0,0,0,0.02)] z-20">
-        
+
         {/* Left Side: Icon + Page Name */}
         <div className="flex items-center gap-3">
           {pathname !== '/dashboard/home' && (
@@ -60,7 +60,7 @@ export default function TopBar({ title }: TopBarProps) {
           )}
 
           <LayoutGrid className="w-[18px] h-[18px] text-[#9ca3af]" />
-          
+
           <span className="text-[17px] font-medium text-[#9ca3af] font-sans tracking-tight">
             {getPageTitle()}
           </span>
@@ -86,12 +86,12 @@ export default function TopBar({ title }: TopBarProps) {
                 className="object-cover"
               />
             </div>
-            
+
             {/* User Name */}
             <span className="text-sm font-semibold text-gray-700 group-hover:text-gray-900 transition-colors">
               {displayName}
             </span>
-            
+
             <ChevronDown className="w-4 h-4 text-gray-400 transition-transform group-hover:translate-y-[1px]" />
           </div>
         </div>
@@ -99,7 +99,7 @@ export default function TopBar({ title }: TopBarProps) {
 
       {/* 2. MOBILE TOPBAR (hidden on desktop) */}
       <header className="flex md:hidden items-center justify-between bg-white mx-4 mt-4 p-3.5 rounded-2xl border border-gray-100 shadow-md z-20 relative">
-        
+
         {/* Left Side: VedaAI Mobile branding */}
         <div className="relative w-[110px] h-7 flex-shrink-0">
           <Image

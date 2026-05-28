@@ -219,23 +219,46 @@ export default function DashboardPage() {
           </div>
 
           {/* Filter & Search Controls */}
-          <div className="bg-white rounded-[24px] px-4 py-3.5 flex items-center gap-3 shadow-sm border border-gray-100">
+          {/* Mobile layout */}
+          <div className="flex md:hidden items-center gap-3 bg-white rounded-[24px] px-4 py-3 shadow-sm border border-gray-100">
             {/* Filter button */}
-            <button className="flex items-center gap-2 text-gray-400 hover:text-gray-700 text-[13px] font-medium transition-colors border-r border-gray-200 pr-3">
+            <button className="flex items-center gap-2 text-gray-400 hover:text-gray-700 text-[13px] font-medium transition-colors shrink-0">
               <Filter className="w-4 h-4" />
-              <span className="hidden sm:inline">Filter</span>
+              <span>Filter</span>
             </button>
 
-            {/* Search Input */}
+            {/* Search Input in its own pill */}
             <div className="relative flex-1">
-              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search Name"
-                className="w-full pl-8 pr-4 py-1 bg-transparent border-none text-[13px] placeholder-gray-400 focus:outline-none focus:ring-0"
-              />
+              <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-full px-3 py-2">
+                <Search className="w-4 h-4 text-gray-400 shrink-0" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search Name"
+                  className="w-full bg-transparent border-none text-[13px] placeholder-gray-400 focus:outline-none focus:ring-0"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop layout */}
+          <div className="hidden md:flex bg-white rounded-[24px] px-5 py-3.5 items-center justify-between shadow-sm border border-gray-100">
+            <button className="flex items-center gap-2 text-gray-400 hover:text-gray-700 text-[13px] font-medium transition-colors shrink-0">
+              <Filter className="w-4 h-4" />
+              <span>Filter By</span>
+            </button>
+            <div className="relative w-[220px]">
+              <div className="flex items-center gap-2 border border-gray-200 rounded-full px-4 py-2">
+                <Search className="w-4 h-4 text-gray-400 shrink-0" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search Assignment"
+                  className="w-full bg-transparent border-none text-[13px] placeholder-gray-400 focus:outline-none focus:ring-0"
+                />
+              </div>
             </div>
           </div>
 

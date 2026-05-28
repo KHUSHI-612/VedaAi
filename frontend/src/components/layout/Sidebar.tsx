@@ -68,8 +68,8 @@ export default function Sidebar() {
     <aside className="hidden md:flex flex-col w-[280px] bg-white fixed left-4 top-4 bottom-4 rounded-[28px] border border-gray-100 shadow-[0_8px_32px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.08)] p-6 z-30 transition-all duration-300">
       
       {/* Top Section: Logo */}
-      <div className="flex items-center px-1 mt-1 mb-2">
-        <div className="relative w-[190px] h-[52px] flex-shrink-0">
+      <div className="flex items-center -ml-1 mt-1 mb-2">
+        <div className="relative w-[220px] h-[60px] flex-shrink-0">
           <Image
             src="/logo2.png"
             alt="VedaAI Logo"
