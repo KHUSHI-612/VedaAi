@@ -48,20 +48,20 @@ export default function TopBar({ title }: TopBarProps) {
       {/* 1. DESKTOP FLOATING TOPBAR (hidden on mobile) */}
       <header className="hidden md:flex items-center justify-between bg-white border border-gray-100 rounded-2xl h-14 mt-4 mr-4 px-5 shadow-[0_4px_20px_rgba(0,0,0,0.02)] z-20">
         
-        {/* Left Side: Back Arrow + Icon + Page Name */}
+        {/* Left Side: Icon + Page Name */}
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center justify-center p-1.5 rounded-full hover:bg-gray-50 text-gray-400 hover:text-gray-800 transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
+          {pathname !== '/dashboard/home' && (
+            <button
+              onClick={() => router.back()}
+              className="w-9 h-9 bg-white rounded-full shadow-[0_2px_12px_rgba(0,0,0,0.06)] flex items-center justify-center mr-2 hover:bg-gray-50 transition-colors active:scale-95"
+            >
+              <ArrowLeft className="w-[18px] h-[18px] text-[#1a1a1a] stroke-[2px]" />
+            </button>
+          )}
+
+          <LayoutGrid className="w-[18px] h-[18px] text-[#9ca3af]" />
           
-          <div className="w-[1px] h-4 bg-gray-200 mx-0.5" />
-          
-          <LayoutGrid className="w-[18px] h-[18px] text-gray-400" />
-          
-          <span className="text-[15px] font-medium text-gray-400 font-sans tracking-wide">
+          <span className="text-[17px] font-medium text-[#9ca3af] font-sans tracking-tight">
             {getPageTitle()}
           </span>
         </div>
@@ -98,12 +98,12 @@ export default function TopBar({ title }: TopBarProps) {
       </header>
 
       {/* 2. MOBILE TOPBAR (hidden on desktop) */}
-      <header className="flex md:hidden items-center justify-between bg-white mx-4 mt-4 p-3.5 rounded-2xl border border-gray-100 shadow-[0_4px_16px_rgba(0,0,0,0.03)] z-20">
+      <header className="flex md:hidden items-center justify-between bg-white mx-4 mt-4 p-3.5 rounded-2xl border border-gray-100 shadow-md z-20 relative">
         
         {/* Left Side: VedaAI Mobile branding */}
-        <div className="relative w-[90px] h-7">
+        <div className="relative w-[110px] h-7 flex-shrink-0">
           <Image
-            src="/logo2.png"
+            src="/mobilelogo.png"
             alt="VedaAI Logo"
             fill
             className="object-contain object-left"

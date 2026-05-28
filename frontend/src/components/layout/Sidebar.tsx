@@ -7,10 +7,10 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAssessmentStore } from '../../store/assessmentStore';
 import {
   LayoutGrid,
-  Users,
+  Presentation,
   FileText,
-  Monitor,
-  Clock,
+  Book,
+  PieChart,
   Settings,
   Sparkles,
   User,
@@ -19,58 +19,63 @@ import {
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { userProfile, loadUserProfile } = useAssessmentStore();
+  const { userProfile, loadUserProfile, assessments, fetchAll } = useAssessmentStore();
 
-  // Load user profile from localStorage on mount
+  // Load user profile and fetch assessment count on mount
   useEffect(() => {
     loadUserProfile();
-  }, [loadUserProfile]);
+    fetchAll();
+  }, [loadUserProfile, fetchAll]);
 
   const navLinks = [
     {
       name: 'Home',
-      href: '/dashboard/home',
+      href: '/dashboard',
       icon: LayoutGrid,
+      enabled: true,
       isActive: pathname === '/dashboard/home',
     },
     {
       name: 'My Groups',
-      href: '/dashboard/groups',
-      icon: Users,
-      isActive: pathname === '/dashboard/groups',
+      href: '#',
+      icon: Presentation,
+      enabled: false,
+      isActive: false,
     },
     {
       name: 'Assignments',
       href: '/dashboard',
       icon: FileText,
-      // Assignments is the main page (/dashboard)
+      enabled: true,
       isActive: pathname === '/dashboard' || pathname.startsWith('/dashboard/assignments'),
     },
     {
       name: "AI Teacher's Toolkit",
-      href: '/dashboard/toolkit',
-      icon: Monitor,
-      isActive: pathname === '/dashboard/toolkit',
+      href: '#',
+      icon: Book,
+      enabled: false,
+      isActive: false,
     },
     {
       name: 'My Library',
-      href: '/dashboard/library',
-      icon: Clock,
-      isActive: pathname === '/dashboard/library',
+      href: '#',
+      icon: PieChart,
+      enabled: false,
+      isActive: false,
     },
   ];
 
   return (
-    <aside className="hidden md:flex flex-col w-[280px] bg-white fixed left-4 top-4 bottom-4 rounded-[28px] border border-gray-100 shadow-[0_8px_32px_rgba(0,0,0,0.03)] p-6 z-30 transition-all duration-300">
+    <aside className="hidden md:flex flex-col w-[280px] bg-white fixed left-4 top-4 bottom-4 rounded-[28px] border border-gray-100 shadow-[0_8px_32px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.08)] p-6 z-30 transition-all duration-300">
       
       {/* Top Section: Logo */}
-      <div className="flex items-center px-1">
+      <div className="flex items-center px-1 mt-1 mb-2">
         <div className="relative w-[190px] h-[52px] flex-shrink-0">
           <Image
             src="/logo2.png"
             alt="VedaAI Logo"
             fill
-            className="object-contain object-left"
+            className="object-contain object-left scale-[1.05] origin-left"
             priority
           />
         </div>
@@ -85,32 +90,58 @@ export default function Sidebar() {
             router.push('/dashboard/create');
           }
         }}
-        className="group relative mt-6 w-full bg-[#1a1a1a] hover:bg-black text-white py-3 px-5 rounded-full flex items-center justify-center gap-2 text-sm font-semibold transition-all duration-200 active:scale-[0.98] border-2 border-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.18)] hover:shadow-[0_0_18px_rgba(249,115,22,0.35)]"
+        className="relative mt-5 w-full flex items-center justify-center transition-transform duration-200 hover:scale-[1.05] active:scale-95"
       >
-        <Sparkles className="w-4 h-4 text-orange-400 group-hover:animate-pulse" />
-        <span>Create Assignment</span>
+        <Image
+          src="/createassigment illustration.png"
+          alt="Create Assignment"
+          width={280}
+          height={80}
+          className="w-full scale-[1.18] h-auto object-contain drop-shadow-[0_4px_16px_rgba(255,94,58,0.2)]"
+        />
       </button>
 
       {/* Navigation Links */}
       <nav className="flex-1 flex flex-col gap-1.5 mt-8 px-1">
         {navLinks.map((link) => {
           const Icon = link.icon;
+          const isAssignments = link.name === 'Assignments';
+          const baseClass = `flex items-center gap-3.5 px-4 py-3 rounded-xl text-[15px] font-medium transition-all duration-150`;
+
+          if (!link.enabled) {
+            // Unbuilt pages — non-clickable but solidly visible gray
+            return (
+              <span
+                key={link.name}
+                className={`${baseClass} text-gray-500 cursor-not-allowed select-none`}
+              >
+                <Icon className="w-5 h-5 text-gray-500 stroke-[2px]" />
+                <span className="flex-1 tracking-tight">{link.name}</span>
+              </span>
+            );
+          }
+
           return (
             <Link
               key={link.name}
               href={link.href}
-              className={`flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150 ${
+              className={`${baseClass} ${
                 link.isActive
-                  ? 'bg-gray-100 text-gray-900 font-semibold'
-                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                  ? 'bg-gray-100 text-[#1a1a1a] font-semibold'
+                  : 'text-gray-500 hover:bg-gray-50 hover:text-[#1a1a1a]'
               }`}
             >
               <Icon
-                className={`w-5 h-5 transition-colors ${
-                  link.isActive ? 'text-gray-900' : 'text-gray-400 group-hover:text-gray-900'
+                className={`w-5 h-5 transition-colors stroke-[2px] ${
+                  link.isActive ? 'text-[#1a1a1a]' : 'text-gray-500'
                 }`}
               />
-              <span>{link.name}</span>
+              <span className="flex-1 tracking-tight">{link.name}</span>
+              {isAssignments && assessments.length > 0 && (
+                <span className="ml-auto bg-orange-500 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full leading-tight">
+                  {assessments.length}
+                </span>
+              )}
             </Link>
           );
         })}

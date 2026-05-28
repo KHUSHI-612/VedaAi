@@ -3,6 +3,8 @@ import { getRedis } from '../config/redis';
 import { Assessment } from '../models/Assessment';
 import { generateQuestions } from '../services/aiService';
 import { emitToClient } from '../config/websocket';
+import { parsePDFText } from '../services/pdfParserService';
+import path from 'path';
 
 const connection = getRedis();
 
@@ -41,7 +43,26 @@ export const assessmentWorker = new Worker(
         message: 'AI question generation has started.',
       });
 
-      // 3. Call generateQuestions using the assessment document configuration
+      // 3. Extract text from uploaded PDF if fileUrl is present
+      let contextText = '';
+      if (assessment.fileUrl) {
+        try {
+          console.log(`[Worker] Found fileUrl ${assessment.fileUrl} for assessment ${assessmentId}. Attempting to parse...`);
+          // Clean the fileUrl to join correctly relative to process.cwd()
+          const relativeFilePath = assessment.fileUrl.startsWith('/') 
+            ? assessment.fileUrl.substring(1) 
+            : assessment.fileUrl;
+          const absoluteFilePath = path.join(process.cwd(), relativeFilePath);
+
+          console.log(`[Worker] Reading PDF from absolute path: ${absoluteFilePath}`);
+          contextText = await parsePDFText(absoluteFilePath);
+          console.log(`[Worker] Successfully extracted ${contextText.length} characters of text from PDF.`);
+        } catch (pdfErr) {
+          console.error(`[Worker] Failed to parse PDF file context. Proceeding without file text. Error:`, pdfErr);
+        }
+      }
+
+      // 4. Call generateQuestions using the assessment document configuration
       console.log(`[Worker] Requesting Groq AI question generation for assessment: ${assessmentId}...`);
       const aiResult = await generateQuestions({
         title: assessment.title,
@@ -52,6 +73,7 @@ export const assessmentWorker = new Worker(
         marksPerQuestion: assessment.marksPerQuestion,
         difficulty: assessment.difficulty,
         instructions: assessment.instructions,
+        contextText: contextText || undefined,
       });
 
       // 4. Map the Groq AI JSON structure safely to fit Mongoose schema ('title' -> 'name')

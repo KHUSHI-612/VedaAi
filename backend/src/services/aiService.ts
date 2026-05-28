@@ -13,6 +13,7 @@ export interface AssessmentDataInput {
   marksPerQuestion?: number;
   difficulty: 'easy' | 'medium' | 'hard';
   instructions?: string;
+  contextText?: string;
 }
 
 /**
@@ -28,6 +29,7 @@ export const buildPrompt = (assessmentData: AssessmentDataInput): string => {
     marksPerQuestion,
     difficulty,
     instructions,
+    contextText,
   } = assessmentData;
 
   return `
@@ -41,6 +43,12 @@ You are an expert curriculum developer and academic educator. Your task is to ge
 ${marksPerQuestion ? `- **Standard Marks per Question**: ${marksPerQuestion}` : ''}
 - **Overall Difficulty Level**: ${difficulty}
 ${instructions ? `- **Additional Instructions**: ${instructions}` : ''}
+
+${contextText ? `### Reference Material / Context:
+Below is the reference text extracted from the uploaded PDF. You MUST strictly base your questions on the topics, concepts, equations, and information described in this reference material. Do not generate questions outside of this scope:
+---
+${contextText}
+---` : ''}
 
 ### Response Requirements:
 You must output a single JSON object. The JSON object must strictly conform to this structure:
@@ -56,6 +64,7 @@ You must output a single JSON object. The JSON object must strictly conform to t
           "text": "Question text...",
           "difficulty": "easy", // 'easy', 'medium', or 'hard'
           "marks": 1,
+          "correctAnswer": "The full correct answer or explanation...",
           "options": ["A) opt1", "B) opt2", "C) opt3", "D) opt4"] // Only include options array for mcq types
         }
       ]

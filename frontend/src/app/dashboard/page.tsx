@@ -16,6 +16,7 @@ import {
   Loader2,
   AlertTriangle,
   X,
+  ArrowLeft,
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -30,6 +31,7 @@ export default function DashboardPage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState<'all' | 'completed' | 'processing' | 'pending'>('all');
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
 
   // First-time user modal state variables
@@ -86,10 +88,31 @@ export default function DashboardPage() {
       return;
     }
 
+    if (modalName.trim().length < 2) {
+      setModalError('Your name must be at least 2 characters long.');
+      return;
+    }
+    if (modalSchoolName.trim().length < 3) {
+      setModalError('School name must be at least 3 characters long.');
+      return;
+    }
+    if (modalCity.trim().length < 3) {
+      setModalError('City location must be at least 3 characters long.');
+      return;
+    }
+
+    // Title case helper
+    const titleCase = (str: string) =>
+      str
+        .split(' ')
+        .filter((w) => w.length > 0)
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+
     const profile = {
-      name: modalName.trim(),
-      schoolName: modalSchoolName.trim(),
-      city: modalCity.trim(),
+      name: titleCase(modalName.trim()),
+      schoolName: titleCase(modalSchoolName.trim()),
+      city: titleCase(modalCity.trim()),
     };
 
     setUserProfile(profile);
@@ -127,10 +150,14 @@ export default function DashboardPage() {
   };
 
   // 6. Filter assessments based on search query
-  const filteredAssessments = assessments.filter((item) =>
-    item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.subject?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredAssessments = assessments.filter((item) => {
+    const matchesSearch =
+      item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.subject?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFilter =
+      activeFilter === 'all' || item.status === activeFilter;
+    return matchesSearch && matchesFilter;
+  });
 
   if (isLoading) {
     return (
@@ -148,9 +175,9 @@ export default function DashboardPage() {
       {/* STATE 1: EMPTY STATE                                     */}
       {/* ======================================================== */}
       {assessments.length === 0 ? (
-        <div className="flex flex-col items-center justify-center text-center min-h-[calc(100vh-12rem)] w-full py-12 px-4">
+        <div className="flex flex-col items-center justify-center text-center flex-1 w-full h-full px-4 pt-16">
           {/* Centered Illustration */}
-          <div className="relative w-[240px] h-[200px] mb-6">
+          <div className="relative w-[160px] h-[130px] mb-6">
             <Image
               src="/Illustration found.png"
               alt="No assignments yet"
@@ -160,18 +187,17 @@ export default function DashboardPage() {
             />
           </div>
 
-          <h2 className="text-[22px] font-bold text-[#1a1a1a] tracking-tight leading-tight">
+          <h2 className="text-[20px] font-bold text-[#1a1a1a] tracking-tight leading-tight">
             No assignments yet
           </h2>
 
-          <p className="text-sm text-gray-400 max-w-[500px] mt-2 mb-8 leading-relaxed">
-            Create your first assignment to start collecting and grading student submissions.
-            You can set up rubrics, define marking criteria, and let AI assist with grading.
+          <p className="text-[13px] text-[#666666] max-w-[280px] mt-2 mb-6 leading-relaxed">
+            Create your first assignment to start collecting and grading student submissions. You can set up rubrics, define marking criteria, and let AI assist with grading.
           </p>
 
           <button
             onClick={handleCreateAssignmentClick}
-            className="bg-[#1a1a1a] hover:bg-black text-white px-7 py-3.5 rounded-full text-sm font-semibold shadow-[0_4px_16px_rgba(0,0,0,0.1)] transition-all active:scale-[0.98]"
+            className="bg-[#1a1a1a] hover:bg-black text-white px-5 py-2.5 rounded-full text-sm font-medium shadow-md transition-all active:scale-[0.98]"
           >
             + Create Your First Assignment
           </button>
@@ -183,52 +209,49 @@ export default function DashboardPage() {
         <div className="space-y-6 animate-fadeIn">
 
           {/* Header Section */}
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center gap-2.5">
-              <span className="w-3 h-3 bg-[#4ade80] rounded-full ring-4 ring-[#4ade80]/20" />
-              <h1 className="text-2xl font-bold text-gray-900 tracking-tight font-sans">
-                Assignments
-              </h1>
-            </div>
-            <p className="text-sm text-gray-500">
-              Manage and create assignments for your classes.
-            </p>
+          <div className="flex items-center relative h-10 mb-2 mt-2">
+            <button className="md:hidden absolute left-0 w-10 h-10 bg-[#e5e7eb] rounded-full flex items-center justify-center transition-colors">
+              <ArrowLeft className="w-5 h-5 text-gray-800" />
+            </button>
+            <h1 className="text-[16px] md:text-2xl font-bold text-gray-900 absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 tracking-tight">
+              Assignments
+            </h1>
           </div>
 
-          {/* Filter & Search Controls bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-transparent pt-2">
-
-            {/* Filter by */}
-            <button className="flex items-center gap-2 text-gray-400 hover:text-gray-800 text-sm font-semibold transition-colors duration-150 py-1.5 px-3 rounded-lg hover:bg-gray-200/50">
+          {/* Filter & Search Controls */}
+          <div className="bg-white rounded-[24px] px-4 py-3.5 flex items-center gap-3 shadow-sm border border-gray-100">
+            {/* Filter button */}
+            <button className="flex items-center gap-2 text-gray-400 hover:text-gray-700 text-[13px] font-medium transition-colors border-r border-gray-200 pr-3">
               <Filter className="w-4 h-4" />
-              <span>Filter By</span>
+              <span className="hidden sm:inline">Filter</span>
             </button>
 
-            {/* Search Input bar */}
-            <div className="relative w-full sm:max-w-xs flex-shrink-0">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gray-400" />
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search Assignment"
-                className="w-full pl-11 pr-4 py-2.5 bg-white border border-gray-200 rounded-full text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 transition-all duration-150 shadow-sm"
+                placeholder="Search Name"
+                className="w-full pl-8 pr-4 py-1 bg-transparent border-none text-[13px] placeholder-gray-400 focus:outline-none focus:ring-0"
               />
             </div>
           </div>
 
           {/* Grid Layout Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-2">
             {filteredAssessments.map((assessment) => (
               <div
                 key={assessment._id}
-                className="relative bg-white rounded-[24px] border border-gray-100 shadow-[0_4px_16px_rgba(0,0,0,0.015)] p-5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.03)] transition-all duration-200"
+                className="relative bg-[#f8f9fa] rounded-[24px] p-5 transition-all duration-200 cursor-pointer shadow-sm border border-gray-100/50"
+                onClick={() => router.push(`/dashboard/assignments/${assessment._id}`)}
               >
                 {/* 3-Dot Options Button */}
                 <div className="absolute right-4 top-4">
                   <button
-                    onClick={() => setActiveMenuId(activeMenuId === assessment._id ? null : assessment._id)}
-                    className="p-1 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors"
+                    onClick={(e) => { e.stopPropagation(); setActiveMenuId(activeMenuId === assessment._id ? null : assessment._id); }}
+                    className="p-1 rounded-full text-gray-400 hover:text-gray-700 transition-colors"
                   >
                     <MoreVertical className="w-5 h-5" />
                   </button>
@@ -236,12 +259,13 @@ export default function DashboardPage() {
                   {/* Actions Dropdown */}
                   {activeMenuId === assessment._id && (
                     <>
-                      {/* Clicking outside closes the menu overlay */}
-                      <div className="fixed inset-0 z-10" onClick={() => setActiveMenuId(null)} />
+                      {/* Backdrop overlay — stop propagation so it doesn't navigate */}
+                      <div className="fixed inset-0 z-10" onClick={(e) => { e.stopPropagation(); setActiveMenuId(null); }} />
 
                       <div className="absolute right-0 mt-1 w-44 bg-white border border-gray-100 rounded-2xl shadow-xl p-1.5 z-20 flex flex-col gap-0.5 animate-fadeIn">
                         <button
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setActiveMenuId(null);
                             router.push(`/dashboard/assignments/${assessment._id}`);
                           }}
@@ -252,7 +276,7 @@ export default function DashboardPage() {
                         </button>
 
                         <button
-                          onClick={() => handleDeleteAssessment(assessment._id)}
+                          onClick={(e) => { e.stopPropagation(); handleDeleteAssessment(assessment._id); }}
                           className="flex items-center gap-2.5 w-full text-left px-3 py-2 rounded-xl text-[13px] font-semibold text-red-600 hover:bg-red-50 transition-colors"
                         >
                           <Trash2 className="w-4.5 h-4.5 text-red-500" />
@@ -264,67 +288,34 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Card Main details */}
-                <div className="space-y-4">
+                <div className="space-y-4 pr-6">
+                  {/* Title */}
+                  <h3 className="text-[15px] font-bold text-neutral-800 line-clamp-1">
+                    {assessment.title || 'Untitled Assessment'}
+                  </h3>
 
-                  {/* Subject Badge & Status */}
-                  <div className="flex items-center justify-between pr-8">
-                    <span className="text-[11px] font-bold tracking-wider uppercase text-orange-600 bg-orange-50 px-2.5 py-1 rounded-full">
-                      {assessment.subject || 'Syllabus'}
+                  {/* Date Row */}
+                  <div className="flex items-center gap-3 text-[12px] text-gray-500 font-medium">
+                    <span>
+                      <span className="text-gray-900 font-bold">Assigned on :</span> {formatDateSafe(assessment.createdAt)}
                     </span>
-
-                    {/* Status Badge */}
-                    <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${assessment.status === 'completed'
-                          ? 'text-emerald-700 bg-emerald-50'
-                          : assessment.status === 'processing'
-                            ? 'text-blue-700 bg-blue-50 animate-pulse'
-                            : assessment.status === 'failed'
-                              ? 'text-rose-700 bg-rose-50'
-                              : 'text-amber-700 bg-amber-50'
-                        }`}
-                    >
-                      {assessment.status}
+                    <span>
+                      <span className="text-gray-900 font-bold">Due :</span> 21-06-2025
                     </span>
                   </div>
-
-                  {/* Title & Info */}
-                  <div>
-                    <h3 className="text-base font-bold text-gray-800 line-clamp-1">
-                      {assessment.title || 'Untitled Assessment'}
-                    </h3>
-                    <p className="text-[12.5px] text-gray-400 mt-1 font-medium">
-                      Class: {assessment.className || 'General'}
-                    </p>
-                  </div>
-
-                  <div className="w-full h-[1px] bg-gray-100" />
-
-                  {/* Dates Row */}
-                  <div className="flex items-center justify-between text-[12px] text-gray-400 font-medium">
-                    <div>
-                      Assigned on:{' '}
-                      <span className="text-gray-600 font-semibold">
-                        {formatDateSafe(assessment.createdAt)}
-                      </span>
-                    </div>
-                    <div>
-                      Due:{' '}
-                      <span className="text-gray-600 font-semibold">
-                        {formatDateSafe(assessment.dueDate)}
-                      </span>
-                    </div>
-                  </div>
-
                 </div>
 
               </div>
             ))}
           </div>
 
-          {/* Desktop Fixed Bottom Create Button */}
-          <div className="hidden md:flex justify-center fixed bottom-6 left-1/2 -translate-x-1/2 z-20">
+          {/* Desktop Fixed Bottom Create Button — centered in main content area */}
+          <div className="hidden md:flex justify-center fixed bottom-6 z-20"
+            style={{ left: '280px', right: '0', pointerEvents: 'none' }}
+          >
             <button
               onClick={handleCreateAssignmentClick}
+              style={{ pointerEvents: 'auto' }}
               className="bg-[#1a1a1a] hover:bg-black text-white px-6 py-3 rounded-full text-sm font-semibold flex items-center gap-2 shadow-lg hover:shadow-xl active:scale-[0.98] transition-all duration-150 border border-gray-800"
             >
               <Plus className="w-4 h-4" />
@@ -335,15 +326,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Mobile Floating Action Button (FAB) (bottom right) */}
-      <div className="flex md:hidden fixed bottom-20 right-6 z-40">
-        <button
-          onClick={handleCreateAssignmentClick}
-          className="w-12 h-12 bg-[#1a1a1a] text-white rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-transform"
-        >
-          <Plus className="w-6 h-6" />
-        </button>
-      </div>
+
 
       {/* ======================================================== */}
       {/* FIRST-TIME USER MODAL                                    */}
@@ -442,6 +425,14 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Mobile Floating Action Button (FAB) */}
+      <button
+        onClick={handleCreateAssignmentClick}
+        className="md:hidden fixed bottom-24 right-6 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md z-50 transition-transform active:scale-95"
+      >
+        <Plus className="w-6 h-6 text-[#f97316]" />
+      </button>
 
     </div>
   );

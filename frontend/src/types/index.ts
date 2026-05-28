@@ -21,6 +21,7 @@ export interface Assessment {
   dueDate: string
   status: 'pending' | 'processing' | 'completed' | 'failed'
   result?: { sections: Section[] }
+  fileUrl?: string
   createdAt: string
 }
 

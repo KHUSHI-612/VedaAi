@@ -125,4 +125,58 @@ router.get('/:id/pdf', async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * POST /api/assessments/:id/regenerate
+ * Re-enqueues AI generation for an existing assessment configuration.
+ */
+router.post('/:id/regenerate', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const assessment = await Assessment.findById(id);
+
+    if (!assessment) {
+      return res.status(404).json({ error: 'Assessment not found.' });
+    }
+
+    // Set status to pending
+    assessment.status = 'pending';
+    assessment.result = undefined; // clear old results
+    await assessment.save();
+
+    // Re-add to BullMQ queue
+    const job = await assessmentQueue.add('generate-assessment', {
+      assessmentId: assessment._id.toString(),
+    });
+
+    assessment.jobId = job.id;
+    await assessment.save();
+
+    // Trigger websocket queued notification
+    emitToClient(assessment._id.toString(), 'job:queued', assessment);
+
+    res.status(200).json(assessment);
+  } catch (error: any) {
+    console.error('Error regenerating assessment:', error);
+    res.status(500).json({ error: error.message || 'Failed to re-trigger generation.' });
+  }
+});
+
+/**
+ * DELETE /api/assessments/:id
+ * Deletes a specific assessment permanently from the database.
+ */
+router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const assessment = await Assessment.findByIdAndDelete(req.params.id);
+    if (!assessment) {
+      res.status(404).json({ error: 'Assessment not found' });
+      return;
+    }
+    res.status(200).json({ message: 'Assessment deleted successfully', id: req.params.id });
+  } catch (error: any) {
+    console.error('Error deleting assessment:', error);
+    res.status(500).json({ error: 'Failed to delete assessment' });
+  }
+});
+
 export default router;

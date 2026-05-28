@@ -9,7 +9,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f0f0f0' }}>
+    <div className="flex h-screen w-full bg-[#e8e8e8] overflow-hidden">
       {/* Sidebar - desktop only */}
       <div style={{
         width: '280px',
@@ -24,14 +24,9 @@ export default function DashboardLayout({
       </div>
 
       {/* Main content */}
-      <div style={{
-        marginLeft: 'var(--sidebar-margin, 312px)',
-        flex: 1,
-        backgroundColor: '#f0f0f0',
-        minHeight: '100vh'
-      }} className="md:ml-[280px] ml-0">
+      <div className="flex-1 bg-[#cecece] min-h-screen md:ml-[280px] ml-0 w-full relative flex flex-col overflow-hidden">
         <TopBar />
-        <main style={{ padding: '24px' }}>
+        <main className="flex-1 flex flex-col p-4 md:p-6 pb-24 md:pb-6 overflow-y-auto">
           {children}
         </main>
       </div>

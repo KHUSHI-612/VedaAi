@@ -48,31 +48,38 @@ export const generatePDF = (assessment: IAssessment): Promise<Buffer> => {
       // 3. Render Sections & Questions
       if (assessment.result && assessment.result.sections && assessment.result.sections.length > 0) {
         assessment.result.sections.forEach((section, sIdx) => {
-          // Section Title
-          doc.fontSize(13).font('Helvetica-Bold').fillColor('#0f172a').text(section.name.toUpperCase());
+          // Section Title - explicitly reset X to 50 to prevent it from inheriting the previous right-aligned X position
+          doc.fontSize(13).font('Helvetica-Bold').fillColor('#0f172a').text(section.name.toUpperCase(), 50, doc.y);
           if (section.instructions) {
-            doc.fontSize(9.5).font('Helvetica-Oblique').fillColor('#475569').text(section.instructions, { lineGap: 2 });
+            doc.fontSize(9.5).font('Helvetica-Oblique').fillColor('#475569').text(section.instructions, 50, doc.y, { lineGap: 2 });
           }
           doc.moveDown(0.8);
 
           // Questions loop
           section.questions.forEach((q, qIdx) => {
             const currentY = doc.y;
-            // Write question text
+            
+            // Write question text (constrained width to prevent overlap)
             doc.fontSize(10.5).font('Helvetica').fillColor('#000000')
-               .text(`${qIdx + 1}.  ${q.text}`, 50, currentY, { width: 400, lineGap: 4 });
+               .text(`${qIdx + 1}.  ${q.text}`, 50, currentY, { width: 360, lineGap: 4 });
+               
+            const bottomOfQuestionY = doc.y; // Save the bottom Y of the potentially multi-line question
+
+            // Difficulty & Marks right-aligned metadata
+            doc.fontSize(8.5).font('Helvetica-Bold').fillColor('#64748b')
+               .text(`[Difficulty: ${q.difficulty} | Marks: ${q.marks}]`, 420, currentY, { width: 125, align: 'right' });
+               
+            // Restore doc.y to the lowest point so options or next question don't overlap
+            doc.y = Math.max(bottomOfQuestionY, doc.y);
 
             // MCQ Options
             if (q.options && q.options.length > 0) {
               doc.moveDown(0.4);
               q.options.forEach((opt) => {
-                doc.fontSize(10).font('Helvetica').fillColor('#334155').text(`     [  ]  ${opt}`, { lineGap: 3 });
+                // Reset X to 50 for options
+                doc.fontSize(10).font('Helvetica').fillColor('#334155').text(`     [  ]  ${opt}`, 50, doc.y, { lineGap: 3 });
               });
             }
-
-            // Difficulty & Marks right-aligned metadata
-            doc.fontSize(8.5).font('Helvetica-Bold').fillColor('#64748b')
-               .text(`[Difficulty: ${q.difficulty} | Marks: ${q.marks}]`, 420, currentY, { align: 'right' });
             
             doc.moveDown(1.2);
           });

@@ -16,9 +16,9 @@ export default function BottomTabBar() {
   const tabs = [
     {
       name: 'Home',
-      href: '/dashboard/home',
+      href: '/dashboard',
       icon: LayoutGrid,
-      isActive: pathname === '/dashboard/home',
+      isActive: false,
     },
     {
       name: 'Assignments',
@@ -28,27 +28,27 @@ export default function BottomTabBar() {
     },
     {
       name: 'Library',
-      href: '/dashboard/library',
+      href: '/dashboard',
       icon: Clock,
-      isActive: pathname === '/dashboard/library',
+      isActive: false,
     },
     {
       name: 'AI Toolkit',
-      href: '/dashboard/toolkit',
+      href: '/dashboard',
       icon: Monitor,
-      isActive: pathname === '/dashboard/toolkit',
+      isActive: false,
     },
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-4 left-4 right-4 bg-[#1a1a1a] rounded-full px-5 py-3 flex items-center justify-between shadow-[0_8px_32px_rgba(0,0,0,0.15)] z-40 border border-gray-800">
+    <nav className="md:hidden fixed bottom-4 left-4 right-4 bg-[#1a1a1a] rounded-[24px] px-6 py-3 flex items-center justify-between shadow-xl z-40 border border-[#333333]">
       {tabs.map((tab) => {
         const Icon = tab.icon;
         return (
           <Link
             key={tab.name}
             href={tab.href}
-            className="flex flex-col items-center justify-center gap-1 flex-1 py-1"
+            className="flex flex-col items-center justify-center gap-[2px] flex-1"
           >
             <Icon
               className={`w-5.5 h-5.5 transition-colors ${
