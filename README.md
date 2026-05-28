@@ -97,23 +97,60 @@ Frontend → Backend API → BullMQ Queue → Worker → Claude AI → MongoDB �
 7. Final structured question paper is displayed
 
 ---
-
 # Project Structure
 
 ```bash
-frontend/
-├── app/
-├── components/
-├── store/
-├── lib/
-├── hooks/
-
-backend/
-├── src/
-│   ├── controllers/
-│   ├── routes/
-│   ├── workers/
-│   ├── queues/
-│   ├── models/
-│   ├── sockets/
+vedaai-assessment/
+├── backend/
+│   ├── src/
+│   │   ├── config/
+│   │   │   ├── database.ts
+│   │   │   ├── queue.ts
+│   │   │   ├── redis.ts
+│   │   │   └── websocket.ts
+│   │   ├── middleware/
+│   │   ├── models/
+│   │   │   └── Assessment.ts
+│   │   ├── routes/
+│   │   │   ├── assessments.ts
+│   │   │   └── upload.ts
+│   │   ├── services/
+│   │   │   ├── aiService.ts
+│   │   │   ├── pdfParserService.ts
+│   │   │   └── pdfService.ts
+│   │   ├── workers/
+│   │   └── index.ts
+│   ├── uploads/
+│   ├── .env.example
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── frontend/
+│   ├── public/
+│   │   └── assets...
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── dashboard/
+│   │   │   │   ├── assignments/[id]/
+│   │   │   │   ├── create/
+│   │   │   │   ├── settings/
+│   │   │   │   ├── layout.tsx
+│   │   │   │   └── page.tsx
+│   │   │   ├── fonts/
+│   │   │   ├── favicon.ico
+│   │   │   ├── globals.css
+│   │   │   ├── layout.tsx
+│   │   │   └── page.tsx
+│   │   ├── components/
+│   │   ├── layout/
+│   │   ├── output/
+│   │   ├── lib/
+│   │   ├── store/
+│   │   └── types/
+│   ├── .env.local
+│   ├── package.json
+│   ├── tailwind.config.ts
+│   └── tsconfig.json
+│
+└── README.md
 │   └── services/
