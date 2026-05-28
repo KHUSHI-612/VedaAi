@@ -12,7 +12,6 @@ import {
   Book,
   PieChart,
   Settings,
-  Sparkles,
   User,
 } from 'lucide-react';
 

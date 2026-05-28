@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAssessmentStore } from '../../../../store/assessmentStore';
 import { WebSocketClient } from '../../../../lib/websocket';
@@ -65,7 +65,6 @@ export default function AssignmentDetailsPage({ params }: AssignmentDetailsPageP
   const { userProfile, loadUserProfile } = useAssessmentStore();
   const [assessment, setAssessment] = useState<AssessmentData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isRegenerating, setIsRegenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // 1. Load User Profile on Mount
@@ -74,18 +73,19 @@ export default function AssignmentDetailsPage({ params }: AssignmentDetailsPageP
   }, [loadUserProfile]);
 
   // 2. Data Fetching Function
-  const fetchDetails = async () => {
+  const fetchDetails = useCallback(async () => {
     try {
       const response = await api.get<AssessmentData>(`/assessments/${id}`);
       setAssessment(response.data);
       setError(null);
-    } catch (err: any) {
-      console.error('[Page] Failed to fetch assessment details:', err);
-      setError(err?.response?.data?.error || 'Failed to load question paper details. Please try again.');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { error?: string } } };
+      console.error('[Page] Failed to fetch assessment details:', error);
+      setError(error.response?.data?.error || 'Failed to load question paper details. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [id]);
 
   // 3. Initial Load and WebSocket subscription setup
   useEffect(() => {
@@ -95,9 +95,9 @@ export default function AssignmentDetailsPage({ params }: AssignmentDetailsPageP
     const ws = new WebSocketClient();
     ws.connect(id);
 
-    ws.onMessage((message: any) => {
+    ws.onMessage((message: unknown) => {
       console.log('[Page WebSocket] Received broadcast message:', message);
-      const { event, data } = message;
+      const { event, data } = message as { event: string; data: AssessmentData };
 
       if (event === 'job:processing') {
         setAssessment((prev) => (prev ? { ...prev, status: 'processing' } : null));
@@ -105,7 +105,7 @@ export default function AssignmentDetailsPage({ params }: AssignmentDetailsPageP
         setAssessment(data);
       } else if (event === 'job:failed') {
         setAssessment((prev) => (prev ? { ...prev, status: 'failed' } : null));
-        setError(data?.error || 'Background AI question generation failed.');
+        setError((data as { error?: string })?.error || 'Background AI question generation failed.');
       }
     });
 
@@ -113,7 +113,7 @@ export default function AssignmentDetailsPage({ params }: AssignmentDetailsPageP
       console.log('[Page] Cleaning up WebSocket subscription.');
       ws.disconnect();
     };
-  }, [id]);
+  }, [id, fetchDetails]);
 
   // 4. Download PDF Action Handler
   const handleDownloadPDF = () => {
@@ -122,20 +122,7 @@ export default function AssignmentDetailsPage({ params }: AssignmentDetailsPageP
     window.location.href = `${apiBase}/assessments/${id}/pdf`;
   };
 
-  // 5. Regenerate Handler
-  const handleRegenerate = async () => {
-    setIsRegenerating(true);
-    setError(null);
-    try {
-      const response = await api.post<AssessmentData>(`/assessments/${id}/regenerate`);
-      setAssessment(response.data);
-    } catch (err: any) {
-      console.error('[Page] Regeneration failed:', err);
-      setError(err?.response?.data?.error || 'Failed to trigger question paper regeneration.');
-    } finally {
-      setIsRegenerating(false);
-    }
-  };
+
 
   // 6. Title Case formatting helper for premium typography
   const titleCase = (str: string) => {

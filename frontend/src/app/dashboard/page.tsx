@@ -31,7 +31,7 @@ export default function DashboardPage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState<'all' | 'completed' | 'processing' | 'pending'>('all');
+  const [activeFilter] = useState<'all' | 'completed' | 'processing' | 'pending'>('all');
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
 
   // First-time user modal state variables
@@ -169,15 +169,15 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="relative pb-16 w-full flex flex-col">
+    <div className="relative pb-16 w-full flex flex-col flex-1 h-full">
 
       {/* ======================================================== */}
       {/* STATE 1: EMPTY STATE                                     */}
       {/* ======================================================== */}
       {assessments.length === 0 ? (
-        <div className="flex flex-col items-center justify-center text-center flex-1 w-full h-full px-4 pt-16">
+        <div className="flex flex-col items-center justify-center text-center flex-1 w-full h-full px-4 m-auto pb-12 transform -translate-x-4 translate-y-6">
           {/* Centered Illustration */}
-          <div className="relative w-[160px] h-[130px] mb-6">
+          <div className="relative w-[340px] h-[260px] mb-8">
             <Image
               src="/Illustration found.png"
               alt="No assignments yet"
@@ -187,17 +187,17 @@ export default function DashboardPage() {
             />
           </div>
 
-          <h2 className="text-[20px] font-bold text-[#1a1a1a] tracking-tight leading-tight">
+          <h2 className="text-[22px] font-bold text-[#1a1a1a] tracking-tight leading-tight">
             No assignments yet
           </h2>
 
-          <p className="text-[13px] text-[#666666] max-w-[280px] mt-2 mb-6 leading-relaxed">
+          <p className="text-[14px] text-[#666666] max-w-[480px] mt-3 mb-8 leading-relaxed">
             Create your first assignment to start collecting and grading student submissions. You can set up rubrics, define marking criteria, and let AI assist with grading.
           </p>
 
           <button
             onClick={handleCreateAssignmentClick}
-            className="bg-[#1a1a1a] hover:bg-black text-white px-5 py-2.5 rounded-full text-sm font-medium shadow-md transition-all active:scale-[0.98]"
+            className="bg-[#1a1a1a] hover:bg-black text-white px-7 py-3 rounded-full text-[14.5px] font-semibold shadow-md transition-all active:scale-[0.98]"
           >
             + Create Your First Assignment
           </button>

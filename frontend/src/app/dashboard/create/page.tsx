@@ -256,8 +256,8 @@ export default function CreateAssignmentPage() {
           />
         </div>
 
-        {/* 3. Main Form White Card Container */}
-        <div className="bg-white border border-gray-100 rounded-[32px] p-6 md:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.02)]">
+        {/* 3. Main Form Container */}
+        <div className="relative">
 
           {/* Error Alert Display */}
           {formError && (
@@ -271,7 +271,8 @@ export default function CreateAssignmentPage() {
           {/* STEP 1: ASSIGNMENT DETAILS                               */}
           {/* ======================================================== */}
           {step === 1 && (
-            <div className="space-y-6 animate-fadeIn">
+            <div className="animate-fadeIn pb-32 md:pb-0">
+              <div className="space-y-6 md:bg-white md:border md:border-gray-100 md:rounded-[32px] md:p-8 md:shadow-[0_8px_32px_rgba(0,0,0,0.02)]">
 
               {/* Step Heading */}
               <div>
@@ -347,7 +348,7 @@ export default function CreateAssignmentPage() {
                     type="date"
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50/50 border border-gray-100 rounded-full text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-orange-100 focus:border-orange-400 transition-all font-medium text-gray-700"
+                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-full text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 transition-all font-medium text-gray-700 shadow-sm"
                   />
                   <CalendarPlus className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                 </div>
@@ -355,110 +356,88 @@ export default function CreateAssignmentPage() {
 
               {/* Question Types Layout Grid */}
               <div className="space-y-4 pt-2">
-                {/* Table Titles Header */}
-                <div className="hidden sm:grid grid-cols-[1fr_32px_120px_120px] gap-4 px-2 mb-2">
-                  <span className="text-sm font-bold text-[#1a1a1a] tracking-tight">Question Type</span>
-                  <span />
-                  <span className="text-sm font-bold text-[#1a1a1a] tracking-tight text-center">No. of Questions</span>
-                  <span className="text-sm font-bold text-[#1a1a1a] tracking-tight text-center">Marks</span>
-                </div>
-
                 {/* Rows */}
-                <div className="space-y-3.5">
+                <div className="space-y-4">
                   {questionRows.map((row) => (
                     <div
                       key={row.id}
-                      className="flex flex-col sm:grid sm:grid-cols-[1fr_32px_120px_120px] items-stretch sm:items-center gap-3 bg-gray-50/30 sm:bg-transparent p-4 sm:p-0 rounded-3xl border border-gray-100 sm:border-0"
+                      className="flex flex-col bg-white rounded-3xl p-4 shadow-[0_2px_10px_rgba(0,0,0,0.04)]"
                     >
-
-                      {/* 1. Dropdown Select */}
-                      <div className="relative flex-1">
-                        <div className="flex items-center gap-3 sm:block">
-                          <div className="relative flex-1 sm:w-full">
-                            <select
-                              value={row.type}
-                              onChange={(e) => updateRowField(row.id, 'type', e.target.value)}
-                              className="w-full appearance-none px-6 py-3.5 bg-white border border-gray-200 rounded-full text-[14px] font-semibold text-[#1a1a1a] focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 shadow-sm transition-all pr-12 cursor-pointer"
-                            >
-                              <option value="mcq">Multiple Choice Questions</option>
-                              <option value="short">Short Questions</option>
-                              <option value="long">Long Questions</option>
-                              <option value="diagram">Diagram/Graph-Based Questions</option>
-                              <option value="numerical">Numerical Problems</option>
-                            </select>
-                            <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-[#1a1a1a] pointer-events-none stroke-[2.5]" />
-                          </div>
-
-                          {/* Mobile Delete Button */}
-                          <button
-                            type="button"
-                            onClick={() => removeQuestionRow(row.id)}
-                            className="sm:hidden text-gray-400 hover:text-red-500 transition-colors p-2 cursor-pointer flex-shrink-0"
+                      {/* Top row: Dropdown and Delete */}
+                      <div className="flex items-center justify-between mb-4 px-2">
+                        <div className="relative flex-1">
+                          <select
+                            value={row.type}
+                            onChange={(e) => updateRowField(row.id, 'type', e.target.value)}
+                            className="w-full appearance-none bg-transparent text-[15px] font-medium text-gray-800 pr-8 focus:outline-none cursor-pointer"
                           >
-                            <X className="w-5 h-5" />
-                          </button>
+                            <option value="mcq">Multiple Choice Questions</option>
+                            <option value="short">Short Questions</option>
+                            <option value="long">Long Questions</option>
+                            <option value="diagram">Diagram/Graph-Based Questions</option>
+                            <option value="numerical">Numerical Problems</option>
+                          </select>
+                          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gray-800 pointer-events-none stroke-[2.5]" />
                         </div>
-                      </div>
-
-                      {/* 2. Desktop Delete Button (sits in its own 32px column) */}
-                      <div className="hidden sm:flex items-center justify-center">
                         <button
                           type="button"
                           onClick={() => removeQuestionRow(row.id)}
-                          className="text-gray-400 hover:text-red-500 transition-colors duration-150 p-1 flex-shrink-0 flex items-center justify-center cursor-pointer"
+                          className="text-gray-800 hover:text-red-500 transition-colors p-1"
                         >
-                          <X className="w-[18px] h-[18px] stroke-[2]" />
+                          <X className="w-4.5 h-4.5 stroke-[2]" />
                         </button>
                       </div>
 
-                      {/* 3. No. of Questions controls */}
-                      <div className="flex items-center justify-between sm:justify-center gap-3">
-                        <span className="text-xs font-bold text-gray-500 sm:hidden">No. of Questions:</span>
-                        <div className="flex items-center justify-between w-full sm:w-[120px] bg-white border border-gray-200 rounded-full px-3.5 py-2 flex items-center shadow-sm select-none">
-                          <button
-                            type="button"
-                            onClick={() => updateRowField(row.id, 'numQuestions', Math.max(1, row.numQuestions - 1))}
-                            className="text-gray-300 hover:text-gray-600 transition-colors text-[20px] leading-none font-light px-1.5 cursor-pointer"
-                          >
-                            −
-                          </button>
-                          <span className="text-[14px] font-bold text-[#1a1a1a] text-center w-6">
-                            {row.numQuestions}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => updateRowField(row.id, 'numQuestions', row.numQuestions + 1)}
-                            className="text-gray-300 hover:text-gray-600 transition-colors text-[18px] leading-none font-light px-1.5 cursor-pointer"
-                          >
-                            +
-                          </button>
+                      {/* Bottom Box: No. of Questions and Marks */}
+                      <div className="bg-[#f0f0f0] rounded-[24px] p-4 flex gap-4">
+                        {/* No. of Questions */}
+                        <div className="flex-1 flex flex-col items-center">
+                          <span className="text-[13px] text-gray-800 font-medium mb-3">No. of Questions</span>
+                          <div className="w-full bg-white border-0 rounded-full px-3 py-2 flex items-center justify-between shadow-sm select-none">
+                            <button
+                              type="button"
+                              onClick={() => updateRowField(row.id, 'numQuestions', Math.max(1, row.numQuestions - 1))}
+                              className="text-gray-400 hover:text-gray-800 text-[20px] leading-none font-light px-2"
+                            >
+                              −
+                            </button>
+                            <span className="text-[14px] font-bold text-gray-800">
+                              {row.numQuestions}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => updateRowField(row.id, 'numQuestions', row.numQuestions + 1)}
+                              className="text-gray-400 hover:text-gray-800 text-[20px] leading-none font-light px-2"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Marks */}
+                        <div className="flex-1 flex flex-col items-center">
+                          <span className="text-[13px] text-gray-800 font-medium mb-3">Marks</span>
+                          <div className="w-full bg-white border-0 rounded-full px-3 py-2 flex items-center justify-between shadow-sm select-none">
+                            <button
+                              type="button"
+                              onClick={() => updateRowField(row.id, 'marks', Math.max(1, row.marks - 1))}
+                              className="text-gray-400 hover:text-gray-800 text-[20px] leading-none font-light px-2"
+                            >
+                              −
+                            </button>
+                            <span className="text-[14px] font-bold text-gray-800">
+                              {row.marks}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => updateRowField(row.id, 'marks', row.marks + 1)}
+                              className="text-gray-400 hover:text-gray-800 text-[20px] leading-none font-light px-2"
+                            >
+                              +
+                            </button>
+                          </div>
                         </div>
                       </div>
-
-                      {/* 4. Marks controls */}
-                      <div className="flex items-center justify-between sm:justify-center gap-3">
-                        <span className="text-xs font-bold text-gray-500 sm:hidden">Marks:</span>
-                        <div className="flex items-center justify-between w-full sm:w-[120px] bg-white border border-gray-200 rounded-full px-3.5 py-2 flex items-center shadow-sm select-none">
-                          <button
-                            type="button"
-                            onClick={() => updateRowField(row.id, 'marks', Math.max(1, row.marks - 1))}
-                            className="text-gray-300 hover:text-gray-600 transition-colors text-[20px] leading-none font-light px-1.5 cursor-pointer"
-                          >
-                            −
-                          </button>
-                          <span className="text-[14px] font-bold text-[#1a1a1a] text-center w-6">
-                            {row.marks}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => updateRowField(row.id, 'marks', row.marks + 1)}
-                            className="text-gray-300 hover:text-gray-600 transition-colors text-[18px] leading-none font-light px-1.5 cursor-pointer"
-                          >
-                            +
-                          </button>
-                        </div>
-                      </div>
-
                     </div>
                   ))}
                 </div>
@@ -509,25 +488,28 @@ export default function CreateAssignmentPage() {
                 </div>
               </div>
 
-              {/* Step 1 Navigation footer buttons */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-gray-50">
-                <button
-                  type="button"
-                  onClick={() => router.push('/dashboard')}
-                  className="w-full sm:w-auto bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 py-3.5 px-7 rounded-full text-sm font-semibold flex items-center justify-center gap-2 active:scale-95 transition-transform"
-                >
-                  <ArrowLeft className="w-4.5 h-4.5" />
-                  <span>Previous</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleNextStep}
-                  className="w-full sm:w-auto bg-[#1a1a1a] hover:bg-black text-white py-3.5 px-7 rounded-full text-sm font-semibold flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-md"
-                >
-                  <span>Next</span>
-                  <ArrowRight className="w-4.5 h-4.5" />
-                </button>
+              </div>
+              
+              {/* Step 1 Navigation footer buttons - Floating on mobile, Static outside on desktop */}
+              <div className="fixed bottom-[80px] left-0 right-0 px-6 flex justify-center z-40 md:static md:bottom-auto md:px-0 md:justify-end md:mt-6">
+                <div className="flex items-center bg-white md:bg-transparent rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] md:shadow-none p-1.5 md:p-0 gap-0 md:gap-4 border md:border-0 border-gray-200">
+                  <button
+                    type="button"
+                    onClick={() => router.push('/dashboard')}
+                    className="bg-white text-gray-800 hover:bg-gray-50 py-3.5 px-6 rounded-l-full md:rounded-full md:border md:border-gray-200 text-sm font-semibold flex items-center gap-2 active:scale-95 transition-transform"
+                  >
+                    <ArrowLeft className="w-4.5 h-4.5" />
+                    <span className="pr-2 md:pr-0">Previous</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleNextStep}
+                    className="bg-[#1a1a1a] text-white hover:bg-black py-3.5 px-8 rounded-full text-sm font-semibold flex items-center gap-2 active:scale-95 transition-transform shadow-md"
+                  >
+                    <span>Next</span>
+                    <ArrowRight className="w-4.5 h-4.5" />
+                  </button>
+                </div>
               </div>
 
             </div>
@@ -537,7 +519,8 @@ export default function CreateAssignmentPage() {
           {/* STEP 2: PAPER DETAILS                                    */}
           {/* ======================================================== */}
           {step === 2 && (
-            <form onSubmit={handleGenerateAssessment} className="space-y-6 animate-fadeIn">
+            <form onSubmit={handleGenerateAssessment} className="animate-fadeIn pb-32 md:pb-0">
+              <div className="space-y-6 md:bg-white md:border md:border-gray-100 md:rounded-[32px] md:p-8 md:shadow-[0_8px_32px_rgba(0,0,0,0.02)]">
 
               {/* Step Heading */}
               <div>
@@ -689,35 +672,39 @@ export default function CreateAssignmentPage() {
                 </div>
               </div>
 
-              {/* Step 2 Navigation footer buttons */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-gray-50">
-                <button
-                  type="button"
-                  onClick={() => setStep(1)}
-                  disabled={isSubmitting}
-                  className="w-full sm:w-auto bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 py-3.5 px-7 rounded-full text-sm font-semibold flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-50 disabled:pointer-events-none"
-                >
-                  <ArrowLeft className="w-4.5 h-4.5" />
-                  <span>Previous</span>
-                </button>
+              </div>
 
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full sm:w-auto bg-[#1a1a1a] hover:bg-black text-white py-3.5 px-7 rounded-full text-sm font-semibold flex items-center justify-center gap-2.5 active:scale-95 transition-transform shadow-md disabled:opacity-50 disabled:pointer-events-none"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-4.5 h-4.5 animate-spin" />
-                      <span>Generating Paper...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Generate</span>
-                      <ArrowRight className="w-4.5 h-4.5" />
-                    </>
-                  )}
-                </button>
+              {/* Step 2 Navigation footer buttons - Floating on mobile, Static outside on desktop */}
+              <div className="fixed bottom-[80px] left-0 right-0 px-6 flex justify-center z-40 md:static md:bottom-auto md:px-0 md:justify-end md:mt-6">
+                <div className="flex items-center bg-white md:bg-transparent rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] md:shadow-none p-1.5 md:p-0 gap-0 md:gap-4 border md:border-0 border-gray-200">
+                  <button
+                    type="button"
+                    onClick={() => setStep(1)}
+                    disabled={isSubmitting}
+                    className="bg-white text-gray-800 hover:bg-gray-50 py-3.5 px-6 rounded-l-full md:rounded-full md:border md:border-gray-200 text-sm font-semibold flex items-center gap-2 active:scale-95 transition-transform disabled:opacity-50 disabled:pointer-events-none"
+                  >
+                    <ArrowLeft className="w-4.5 h-4.5" />
+                    <span className="pr-2 md:pr-0">Previous</span>
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="bg-[#1a1a1a] text-white hover:bg-black py-3.5 px-8 rounded-full text-sm font-semibold flex items-center gap-2.5 active:scale-95 transition-transform shadow-md disabled:opacity-50 disabled:pointer-events-none"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4.5 h-4.5 animate-spin" />
+                        <span>Generating Paper...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Generate</span>
+                        <ArrowRight className="w-4.5 h-4.5" />
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
 
             </form>
