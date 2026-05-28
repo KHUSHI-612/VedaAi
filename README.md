@@ -4,12 +4,11 @@ AI-powered assessment generation platform built using modern full-stack technolo
 
 ## Live Demo
 
-[VedaAI Live Demo](https://veda-ai-delta-six.vercel.app/dashboard?utm_source=chatgpt.com)
+[VedaAI Live Demo](https://veda-ai-delta-six.vercel.app/dashboard)
 
 ## GitHub Repository
 
-[VedaAI GitHub Repository](https://github.com/KHUSHI-612/VedaAi?utm_source=chatgpt.com)
-
+[VedaAI GitHub Repository](https://github.com/KHUSHI-612/VedaAi)
 ---
 
 # Features
