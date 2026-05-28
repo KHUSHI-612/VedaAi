@@ -1,7 +1,7 @@
 export class WebSocketClient {
   private ws: WebSocket | null = null;
   private url: string;
-  private callback: ((data: any) => void) | null = null;
+  private callback: ((data: unknown) => void) | null = null;
 
   constructor(url: string = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:5000') {
     this.url = url;
@@ -42,7 +42,7 @@ export class WebSocketClient {
     };
   }
 
-  onMessage(callback: (data: any) => void) {
+  onMessage(callback: (data: unknown) => void) {
     this.callback = callback;
   }
 

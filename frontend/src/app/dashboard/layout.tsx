@@ -9,15 +9,35 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen bg-[#f0f0f0]">
-      <Sidebar />
-      <div className="flex flex-col flex-1 overflow-hidden md:pl-[312px] transition-all duration-300">
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f0f0f0' }}>
+      {/* Sidebar - desktop only */}
+      <div style={{
+        width: '280px',
+        flexShrink: 0,
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        height: '100vh',
+        zIndex: 40
+      }} className="hidden md:block">
+        <Sidebar />
+      </div>
+
+      {/* Main content */}
+      <div style={{
+        marginLeft: 'var(--sidebar-margin, 312px)',
+        flex: 1,
+        backgroundColor: '#f0f0f0',
+        minHeight: '100vh'
+      }} className="md:ml-[280px] ml-0">
         <TopBar />
-        <main className="flex-1 overflow-y-auto p-6 pb-24 md:pb-6">
+        <main style={{ padding: '24px' }}>
           {children}
         </main>
-        <BottomTabBar />
       </div>
+
+      {/* Mobile bottom tab bar */}
+      <BottomTabBar />
     </div>
-  );
+  )
 }

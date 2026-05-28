@@ -19,7 +19,7 @@ interface AssessmentState {
   loadUserProfile: () => void;
 }
 
-export const useAssessmentStore = create<AssessmentState>((set, get) => ({
+export const useAssessmentStore = create<AssessmentState>((set) => ({
   assessments: [],
   currentAssessment: null,
   jobStatus: 'idle',

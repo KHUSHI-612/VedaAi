@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 export default function AssignmentForm() {
   const { register, handleSubmit } = useForm();
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: Record<string, unknown>) => {
     console.log(data);
   };
 

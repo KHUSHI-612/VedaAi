@@ -14,7 +14,6 @@ import {
   Eye,
   Plus,
   Loader2,
-  FileText,
   AlertTriangle,
   X,
 } from 'lucide-react';
@@ -23,7 +22,6 @@ export default function DashboardPage() {
   const router = useRouter();
   const {
     assessments,
-    currentAssessment,
     userProfile,
     fetchAll,
     setUserProfile,
@@ -44,7 +42,7 @@ export default function DashboardPage() {
   // 1. Initial hydration and data loading
   useEffect(() => {
     loadUserProfile();
-    
+
     const initData = async () => {
       try {
         await fetchAll();
@@ -54,24 +52,19 @@ export default function DashboardPage() {
         setIsLoading(false);
       }
     };
-    
+
     initData();
   }, [loadUserProfile, fetchAll]);
 
-  // 2. Trigger welcome modal if userProfile is empty after load
+  // 2. Trigger welcome modal ONLY if redirected with triggerProfile=true parameter and profile is missing
   useEffect(() => {
-    if (!isLoading) {
-      if (!userProfile) {
-        setShowWelcomeModal(true);
-        // Check for redirect query parameter trigger
-        if (typeof window !== 'undefined') {
-          const urlParams = new URLSearchParams(window.location.search);
-          if (urlParams.get('triggerProfile') === 'true') {
-            setModalError('Please set up your profile to start creating assignments!');
-          }
+    if (!isLoading && !userProfile) {
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('triggerProfile') === 'true') {
+          setShowWelcomeModal(true);
+          setModalError('Please set up your profile to start creating assignments!');
         }
-      } else {
-        setShowWelcomeModal(false);
       }
     }
   }, [isLoading, userProfile]);
@@ -92,13 +85,13 @@ export default function DashboardPage() {
       setModalError('Please fill in all three fields to get started.');
       return;
     }
-    
+
     const profile = {
       name: modalName.trim(),
       schoolName: modalSchoolName.trim(),
       city: modalCity.trim(),
     };
-    
+
     setUserProfile(profile);
     setShowWelcomeModal(false);
   };
@@ -109,7 +102,7 @@ export default function DashboardPage() {
     if (!confirm('Are you sure you want to delete this assessment? This action cannot be undone.')) {
       return;
     }
-    
+
     try {
       // Attempt delete API call in the backend
       await api.delete(`/assessments/${id}`);
@@ -149,13 +142,13 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="relative pb-16">
-      
+    <div className="relative pb-16 w-full flex flex-col">
+
       {/* ======================================================== */}
       {/* STATE 1: EMPTY STATE                                     */}
       {/* ======================================================== */}
       {assessments.length === 0 ? (
-        <div className="min-h-[70vh] flex flex-col items-center justify-center text-center p-4">
+        <div className="flex flex-col items-center justify-center text-center min-h-[calc(100vh-12rem)] w-full py-12 px-4">
           {/* Centered Illustration */}
           <div className="relative w-[240px] h-[200px] mb-6">
             <Image
@@ -166,13 +159,13 @@ export default function DashboardPage() {
               priority
             />
           </div>
-          
+
           <h2 className="text-[22px] font-bold text-[#1a1a1a] tracking-tight leading-tight">
             No assignments yet
           </h2>
-          
+
           <p className="text-sm text-gray-400 max-w-[500px] mt-2 mb-8 leading-relaxed">
-            Create your first assignment to start collecting and grading student submissions. 
+            Create your first assignment to start collecting and grading student submissions.
             You can set up rubrics, define marking criteria, and let AI assist with grading.
           </p>
 
@@ -188,7 +181,7 @@ export default function DashboardPage() {
         /* STATE 2: ASSIGNMENTS GRID STATE                           */
         /* ======================================================== */
         <div className="space-y-6 animate-fadeIn">
-          
+
           {/* Header Section */}
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-2.5">
@@ -204,7 +197,7 @@ export default function DashboardPage() {
 
           {/* Filter & Search Controls bar */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-transparent pt-2">
-            
+
             {/* Filter by */}
             <button className="flex items-center gap-2 text-gray-400 hover:text-gray-800 text-sm font-semibold transition-colors duration-150 py-1.5 px-3 rounded-lg hover:bg-gray-200/50">
               <Filter className="w-4 h-4" />
@@ -245,7 +238,7 @@ export default function DashboardPage() {
                     <>
                       {/* Clicking outside closes the menu overlay */}
                       <div className="fixed inset-0 z-10" onClick={() => setActiveMenuId(null)} />
-                      
+
                       <div className="absolute right-0 mt-1 w-44 bg-white border border-gray-100 rounded-2xl shadow-xl p-1.5 z-20 flex flex-col gap-0.5 animate-fadeIn">
                         <button
                           onClick={() => {
@@ -257,7 +250,7 @@ export default function DashboardPage() {
                           <Eye className="w-4.5 h-4.5 text-gray-400" />
                           <span>View Assignment</span>
                         </button>
-                        
+
                         <button
                           onClick={() => handleDeleteAssessment(assessment._id)}
                           className="flex items-center gap-2.5 w-full text-left px-3 py-2 rounded-xl text-[13px] font-semibold text-red-600 hover:bg-red-50 transition-colors"
@@ -272,24 +265,23 @@ export default function DashboardPage() {
 
                 {/* Card Main details */}
                 <div className="space-y-4">
-                  
+
                   {/* Subject Badge & Status */}
                   <div className="flex items-center justify-between pr-8">
                     <span className="text-[11px] font-bold tracking-wider uppercase text-orange-600 bg-orange-50 px-2.5 py-1 rounded-full">
                       {assessment.subject || 'Syllabus'}
                     </span>
-                    
+
                     {/* Status Badge */}
                     <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                        assessment.status === 'completed'
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${assessment.status === 'completed'
                           ? 'text-emerald-700 bg-emerald-50'
                           : assessment.status === 'processing'
-                          ? 'text-blue-700 bg-blue-50 animate-pulse'
-                          : assessment.status === 'failed'
-                          ? 'text-rose-700 bg-rose-50'
-                          : 'text-amber-700 bg-amber-50'
-                      }`}
+                            ? 'text-blue-700 bg-blue-50 animate-pulse'
+                            : assessment.status === 'failed'
+                              ? 'text-rose-700 bg-rose-50'
+                              : 'text-amber-700 bg-amber-50'
+                        }`}
                     >
                       {assessment.status}
                     </span>
@@ -359,7 +351,7 @@ export default function DashboardPage() {
       {showWelcomeModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-[32px] p-8 max-w-md w-full shadow-2xl relative flex flex-col items-center border border-gray-100 animate-scaleIn">
-            
+
             {/* Close Button X */}
             <button
               type="button"
@@ -395,7 +387,7 @@ export default function DashboardPage() {
             )}
 
             <form onSubmit={handleModalSubmit} className="w-full space-y-4">
-              
+
               {/* Name */}
               <div className="space-y-1">
                 <label className="text-xs font-bold text-gray-600 pl-1">

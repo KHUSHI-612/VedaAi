@@ -2,26 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Responsive custom property for fixed sidebar margin */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --sidebar-margin: 312px;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (max-w: 767px) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+    --sidebar-margin: 0px;
   }
 }
